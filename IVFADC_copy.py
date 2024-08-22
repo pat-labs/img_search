@@ -9,7 +9,8 @@ from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.mixture import GaussianMixture
 
-from utils import load_gmm_model, load_keypoints_and_descriptors, read_image
+from benchmark import exec_sift
+from utils import load_descriptors, load_gmm_model, read_image
 
 
 def reduce_dimensionality(image_descriptors, n_components=64):
@@ -157,16 +158,16 @@ def main():
     5. Crear índice Faiss: Usar create_faiss_index para crear el índice.
     6. Buscar imágenes similares: Para una imagen de consulta, calcular su vector de Fisher y usar search_similar_images para encontrar las imágenes más similares.
     """
-    data = load_keypoints_and_descriptors(
-        "C://Users//pa-tr//Documents//projects//img_search//assets//data//SIFT.pkl"
-    )
-    gmm = load_gmm_model(
-        "C://Users//pa-tr//Documents//projects//img_search//result//model//gmm_model_fisher_vector.pkl"
-    )
-    image_descriptors = data[0][2]
+    # data = load_descriptors(
+    #     "assets/data/15238348741_c2fb12ecf2_m.jpg_SIFT_DESCRIPTORS.npy"
+    # )
+    # gmm = load_gmm_model(
+    #     "result/model/gmm_model_fisher_vector.pkl"
+    # )
+    _, image_descriptors = exec_sift("assets/train/15238348741_c2fb12ecf2_m.jpg")
 
     # Perform clustering on high-dimensional descriptors
-    image_vocabulary, kmeans = create_visual_vocabulary(image_descriptors, 1000)
+    image_vocabulary, kmeans = create_visual_vocabulary(image_descriptors, 190)
 
     # Dimensionality reduction using PCA
     reduced_descriptors, pca = reduce_dimensionality(
@@ -187,13 +188,14 @@ def main():
 
     ##SECOND PART
     # Load and process query image
-    query_image_path = "C://Users//pa-tr//Documents//projects//img_search//assets//train//annapurna.jpg"
+    query_image_path = "assets/train/15238348741_c2fb12ecf2_m.jpg"
     _, query_gray = read_image(query_image_path)
     if query_gray is None:
         raise ValueError("Failed to load or process the query image")
     query_descriptors = copy.deepcopy(image_descriptors)
     query_reduced_descriptors = pca.transform(query_descriptors)
     query_histogram = create_histogram(query_reduced_descriptors, kmeans)
+    print(query_histogram)
 
     # Ensure the query_fisher_vector is reshaped properly if needed
     if query_histogram.ndim == 1:

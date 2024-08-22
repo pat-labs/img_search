@@ -4,26 +4,35 @@ import random
 
 import numpy as np
 from matplotlib import pyplot as plt
+import pandas as pd
 from skimage.feature import ORB, fisher_vector, learn_gmm
 from skimage.transform import resize
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
 
-from utils import create_empty_file, read_image
+from utils import read_image
 
+
+def read_image(filename):
+    gray = cv.imread(filename, cv.COLOR_BGR2GRAY)
+    if gray is None:
+        raise ValueError(f"Could not open {filename}")
+    return gray
 
 def get_dataset(dataset_train_path, dataset_test_path):
-    train = list()
+    flowers = dict()
+
     for root, _, files in os.walk(dataset_train_path):
         for file in files:
-            if file.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".tiff")):
+            if file.lower().endswith(".jpg"):
                 image_path = os.path.join(root, file)
-                _, gray = read_image(image_path)
-                if gray is not None:
-                    train.append(gray)
+                gray = read_image(image_path)
+                flowers[image_path] = gray
+                    
 
     target = list()
+    target_file_name = list()
     for root, _, files in os.walk(dataset_test_path):
         for file in files:
             if file.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".tiff")):
@@ -31,6 +40,7 @@ def get_dataset(dataset_train_path, dataset_test_path):
                 _, gray = read_image(image_path)
                 if gray is not None:
                     target.append(gray)
+                    target_file_name.append(image_path)
 
     # Equalize lengths by sampling from the larger list
     if len(train) > len(target):
@@ -99,6 +109,9 @@ def test(images, targets, plot_path):
 
     predictions = svm.predict(testing_fvs)
 
+    # df = pd.DataFrame({'Prediction': predictions})
+    # df.to_csv('result/data/predictions.csv', index=False)
+
     print(classification_report(test_targets, predictions))
 
     ConfusionMatrixDisplay.from_estimator(
@@ -115,12 +128,10 @@ def test(images, targets, plot_path):
 
 
 if __name__ == "__main__":
-    dataset_train_path = "C://Users//pa-tr//Documents//projects//img_search//dataset//flowers//train//sunflower"
-    dataset_test_path = (
-        "C://Users//pa-tr//Documents//projects//img_search//dataset//flowers//test"
-    )
-    model_path = "C://Users//pa-tr//Documents//projects//img_search//result//model//gmm_model_fisher_vector.pkl"
-    plot_path = "C://Users//pa-tr//Documents//projects//img_search//result//plot//confusion_matrix.png"
+    dataset_train_path = "dataset/flowers/train/sunflower"
+    dataset_test_path = "dataset/flowers/test"
+    model_path = "result/model/gmm_model_fisher_vector.pkl"
+    plot_path = "result/plot/confusion_matrix.png"
     train, targets = get_dataset(dataset_train_path, dataset_test_path)
     gmm = test(train, targets, plot_path)
     # Save the GMM model to a file

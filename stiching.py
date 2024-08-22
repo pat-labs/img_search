@@ -3,8 +3,11 @@ import os
 import cv2 as cv
 
 from stich import HarrisCornerDetection
-from stich.PanoramaStitching import (DetectAndComputeAlgorithm,
-                                     MatcherAlgorithm, stitch_two_images)
+from stich.PanoramaStitching import (
+    DetectAndComputeAlgorithm,
+    MatcherAlgorithm,
+    stitch_two_images,
+)
 from utils import save_to_csv, set_plot, time_it
 
 harris_threshold = 0.20

@@ -1,12 +1,35 @@
 import logging
 from functools import cmp_to_key
 
-from cv2 import (INTER_LINEAR, INTER_NEAREST, GaussianBlur, KeyPoint, resize,
-                 subtract)
-from numpy import (all, any, arctan2, array, cos, deg2rad, dot, exp, float32,
-                   floor, full, isnan, log, logical_and, nan, pi, rad2deg,
-                   roll, round, sin, sqrt, stack, trace, unravel_index, where,
-                   zeros)
+from cv2 import INTER_LINEAR, INTER_NEAREST, GaussianBlur, KeyPoint, resize, subtract
+from numpy import (
+    all,
+    any,
+    arctan2,
+    array,
+    cos,
+    deg2rad,
+    dot,
+    exp,
+    float32,
+    floor,
+    full,
+    isnan,
+    log,
+    logical_and,
+    nan,
+    pi,
+    rad2deg,
+    roll,
+    round,
+    sin,
+    sqrt,
+    stack,
+    trace,
+    unravel_index,
+    where,
+    zeros,
+)
 from numpy.linalg import det, lstsq, norm
 
 ####################

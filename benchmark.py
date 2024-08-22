@@ -4,9 +4,16 @@ import cv2 as cv
 import numpy as np
 
 from stich.PanoramaStitching import DetectAndComputeAlgorithm
-from utils import (get_data_from_csv, read_image, save_descriptors,
-                   save_keypoints, save_to_csv, set_plot,
-                   set_plot_multiple_values, time_it)
+from utils import (
+    get_data_from_csv,
+    read_image,
+    save_descriptors,
+    save_keypoints,
+    save_to_csv,
+    set_plot,
+    set_plot_multiple_values,
+    time_it,
+)
 
 RESULT_PATH = "result/image"
 
@@ -317,17 +324,26 @@ def plot_results(result_path, transform_result_path):
     header_1, data_1 = get_data_from_csv(result_path)
     algorithm_time = list()
     i = 0
+    features_labels = [
+        "SIFT",
+        "ORB",
+        "KAZE",
+        "AKAZE",
+        "BRISK",
+        "SIFT_BRIEF",
+        "FREAK_SIFT",
+    ]
     for idx in range(0, len(data_1), 3):
         algorithm_time.append((data_1[idx][3], data_1[idx + 1][3], data_1[idx + 2][3]))
-        labels[i] = (
-            f"{labels[i]}\n({data_1[idx][2]}, {data_1[idx + 1][2]}, {data_1[idx + 2][2]})"
+        features_labels[i] = (
+            f"{features_labels[i]}\n({data_1[idx][2]}, {data_1[idx + 1][2]}, {data_1[idx + 2][2]})"
         )
         i += 1
 
     set_plot_multiple_values(
         algorithm_time,
         ["NORMAL", "INCREASE_BRIGHTNESS", "ROTATED"],
-        labels,
+        features_labels,
         "Average time algorithms",
         "Features",
         "Time (ms)",
@@ -377,8 +393,8 @@ if __name__ == "__main__":
     result_path = "result/data/algorithm_comparison.csv"
     transform_result_path = "result/data/transform_comparison.csv"
     # test_functions(result_path, transform_result_path)
-    # plot_results(result_path, transform_result_path)
-    generate_features_file()
+    plot_results(result_path, transform_result_path)
+    # generate_features_file()
     # k, d = exec_brief_orb("assets//train//15238348741_c2fb12ecf2_m.jpg")
     # print(type(k))
     # print(k)

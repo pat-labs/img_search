@@ -153,17 +153,18 @@ def main():
     IVFADC
     _summary_
     1. Create BoF
-       1.1. Extracción de Características SIFT y Almacenamiento (formato pkl)
-       1.2. Product Quantization
-        * Construcción del vocabulario visual Utilizar un algoritmo de clustering como k-means para agrupar los descriptores SIFT en un número fijo de clusters. Cada cluster representa una "palabra visual".
+       1.1. Extracción de Características ORB y Almacenamiento (formato pkl)
+       1.2. Creacion de vocabulario y aplicacion de Product Quantization
+        * Construcción del vocabulario visual Utilizar un algoritmo de clustering como k-means para agrupar los descriptores ORB en un número fijo de clusters. Cada cluster representa una "palabra visual".
        1.3. Construcción de Histogramas de Palabras Visuales
     * Para cada imagen, asignar cada descriptor SIFT al cluster más cercano (su "palabra visual").
     * Contar la frecuencia de cada palabra visual en la imagen para construir el histograma.
-    2. Cálculo de Fisher Vectors
+    2. Cálculo de Fisher Vectors y reduccion de dimensionalidad con PCA alternativamente (t-SNE)
     * Calcular la matriz de Fisher basada en los histogramas.
     * Utilizar la matriz de Fisher para calcular la similitud entre pares de imágenes.
     3. Creación del Índice Faiss
-    4. Búsqueda de Imágenes Similares
+    4. Búsqueda de Imágenes metricas de similitud kernel de interseccion y kernel x^2
+    5. Ranking de busquedas
     _detail_
     1. Extraer características: Aplicar extract_sift_features a todas las imágenes y guardar los descriptores.
     2. Crear vocabulario visual: Concatenar todos los descriptores y usar create_visual_vocabulary para obtener los centros de los clusters.
