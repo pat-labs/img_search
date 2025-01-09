@@ -1,0 +1,13 @@
+services:
+  app:
+    container_name: ${APP_HOST:-img_search}
+    build: .
+    volumes:
+      - ./src/:/home/app/src/
+    networks:
+      - public
+      
+networks:
+  public:
+    external: true
+
