@@ -16,6 +16,8 @@ labels = ["SIFT", "ORB", "KAZE", "AKAZE", "BRISK", "SIFT_FREAK", "START_BRIEF"]
 algorithms_perfomance_path = "result/algorithms_performance.csv"
 match_bright_path = "result/match_bright.csv"
 match_rotate_path = "result/match_rotate.csv"
+brightness = 150
+angle = 180
 
 
 def timeIt(func, *args, **kwargs):
@@ -47,13 +49,9 @@ def process():
         execStartBrief,
     ]
 
-    # 1-254
-    brightness = 150
     increaseBrightness(
         img_path + img_extension, img_path + "_bright" + img_extension, brightness
     )
-    # 1-359
-    angle = 180
     rotateImage(img_path + img_extension, img_path + "_rotate" + img_extension, angle)
 
     header_1 = ["INDEX", "LABEL", "FEATURES", "TIME_LAPSE"]
@@ -186,6 +184,6 @@ def plotMatch(data_path, title):
 
 if __name__ == "__main__":
     process()
-    plotPerformanceAlgoprithm(algorithm_performance_path)
+    plotPerformanceAlgoprithm(algorithms_perfomance_path)
     plotMatch(match_bright_path, "bright")
     plotMatch(match_rotate_path, "rotate")

@@ -11,6 +11,14 @@ from sklearn.decomposition import PCA
 
 from algorithms_keypoints_descriptors import execSift, readImage
 
+train_data_path = "asset/flower/train"
+test_data_path = "asset/flower/test"
+
+# Create directories for training and testing datasets
+train_data_dir = "asset/flower/train"
+train_dir = "asset/working/train/"
+test_dir = "asset/working/test/"
+
 
 class ImageData(BaseModel):
     filename: str
@@ -120,10 +128,35 @@ def knn(base_images: List[ImageData], target_images: List[ImageData]) -> None:
 
 
 def main() -> None:
-    train_images, train_labels = loadImages("asset/test_dataset/train")
+    # Data path
+    data_dir = Path(train_data_dir)
+    if not os.path.exists(data_dir):
+        raise FileNotFoundError(f"Directory not found: {data_dir}")
+
+    # Call the prepare_dataset function
+    classes, train_df, test_df = prepare_dataset(data_dir, train_dir, test_dir)
+
+    # Initialize new columns for descriptors and predict_label in train_df
+    train_df["descriptors"] = None
+    train_df["histogram"] = None
+    train_df["predict_label"] = None
+
+    # Iterate through each row to update the descriptors
+    for idx, row in train_df.iterrows():
+        image_matrix = readImage(row["image_path"], 80, 80)
+        if image_matrix is not None:
+            _, des = execSift(image_matrix)
+            train_df.at[idx, "descriptors"] = des  # Update descriptors column
+
+    # The `predict_label` column is already initialized with `None`, no further updates needed.
+
+    print("Updated training DataFrame:")
+    print(train_df.head())
+
+    train_images, train_labels = loadImages(train_data_path)
     # print(f"ENUMS:\n{train_labels}")
     # print([(image.filename, image.label) for image in train_images])
-    test_images, _ = loadImages("asset/test_dataset/test")
+    test_images, _ = loadImages(test_data_path)
     # print([(image.filename, image.label) for image in test_images])
 
     # Takes the central points which is visual words

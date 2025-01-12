@@ -87,6 +87,26 @@ def brightnessMatch(kp1, des1, kp2, des2):
     return per_r, dist_r
 
 
+def increase_contrast(img):
+    # converting to LAB color space
+    lab = cv.cvtColor(img, cv.COLOR_BGR2LAB)
+    l_channel, a, b = cv.split(lab)
+
+    # Applying CLAHE to L-channel
+    # feel free to try different values for the limit and grid size:
+    clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    cl = clahe.apply(l_channel)
+
+    # merge the CLAHE enhanced L-channel with the a and b channel
+    limg = cv.merge((cl, a, b))
+
+    # Converting image from LAB Color model to BGR color spcae
+    enhanced_img = cv.cvtColor(limg, cv.COLOR_LAB2BGR)
+
+    # Stacking the original image with the enhanced image
+    return np.hstack((img, enhanced_img))
+
+
 def execSift(img, features: int = 5000):
     sift = cv.SIFT_create(features)
     kp, des = sift.detectAndCompute(img, None)

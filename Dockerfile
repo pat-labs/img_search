@@ -53,7 +53,7 @@ RUN pip install --no-cache /wheels/*
 # change to the app user
 # USER app
 
-WORKDIR $APP_HOME
+WORKDIR $APP_HOME/src
 
 # run entrypoint.prod.sh
 # ENTRYPOINT ["/home/app/entrypoint.sh"]

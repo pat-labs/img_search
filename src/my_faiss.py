@@ -8,6 +8,8 @@ from pydantic import BaseModel
 
 from algorithms_keypoints_descriptors import execSift, readImage
 
+train_data_path = "asset/flower/train"
+
 
 class ImageData(BaseModel):
     filename: str
@@ -45,7 +47,7 @@ def loadImages(root_folder: str) -> Tuple[List[ImageData], List[str]]:
 
 
 def buildIndex(vectors: np.array) -> faiss.Index:
-    vectors = vectors.astype('float32')
+    vectors = vectors.astype("float32")
     vector_dimension = vectors.shape[1]
 
     index = faiss.IndexFlatIP(vector_dimension)
@@ -83,9 +85,9 @@ def findSimilarImages(
 
 
 def main() -> None:
-    train_images, train_labels = loadImages("asset/flower/train")
+    train_images, train_labels = loadImages(train_data_path)
     descriptors = np.vstack(
-        [item.descriptors for item in images if item.descriptors is not None]
+        [item.descriptors for item in train_images if item.descriptors is not None]
     )
     index = buildIndex(descriptors)
 

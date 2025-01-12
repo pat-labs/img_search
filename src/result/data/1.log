@@ -1,0 +1,79 @@
+Total number of images: 4317
+classes: {'sunflower', 'tulip', 'rose', 'daisy', 'dandelion'}
+Sample of Data
+                                          image_path  label
+0  asset/flower/train/tulip/13903946578_187f904c9...  tulip
+1  asset/flower/train/tulip/4546299243_23cd58eb43...  tulip
+2  asset/flower/train/tulip/17706953166_cc21734d2...  tulip
+3  asset/flower/train/tulip/19722589898_233a0235a...  tulip
+4  asset/flower/train/tulip/4263272885_1a49ea5209...  tulip
+Train set size: 3453
+Test set size: 864
+Data successfully split into training and testing sets.
+Descriptor is empty for the file: asset/flower/train/dandelion/34732908685_a219574ffe_n.jpg
+Title: fisher_matrix_k256_hyperparameter_svm_rbf.model
+/usr/local/lib/python3.10/site-packages/sklearn/mixture/_base.py:270: ConvergenceWarning: Best performing initialization did not converge. Try different init parameters, or increase max_iter, tol, or check for degenerate data.
+  warnings.warn(
+Fitting 5 folds for each of 12 candidates, totalling 60 fits
+[CV 1/5] END ....C=0.1, gamma=0.001, kernel=rbf;, score=0.287 total time= 4.6min
+[CV 2/5] END ....C=0.1, gamma=0.001, kernel=rbf;, score=0.278 total time= 4.6min
+[CV 3/5] END ....C=0.1, gamma=0.001, kernel=rbf;, score=0.291 total time= 4.6min
+[CV 4/5] END ....C=0.1, gamma=0.001, kernel=rbf;, score=0.267 total time= 4.6min
+[CV 5/5] END ....C=0.1, gamma=0.001, kernel=rbf;, score=0.271 total time= 4.7min
+[CV 1/5] END ...C=0.1, gamma=0.0001, kernel=rbf;, score=0.243 total time= 4.5min
+[CV 2/5] END ...C=0.1, gamma=0.0001, kernel=rbf;, score=0.245 total time= 4.5min
+[CV 3/5] END ...C=0.1, gamma=0.0001, kernel=rbf;, score=0.243 total time= 4.5min
+[CV 4/5] END ...C=0.1, gamma=0.0001, kernel=rbf;, score=0.243 total time= 4.5min
+[CV 5/5] END ...C=0.1, gamma=0.0001, kernel=rbf;, score=0.243 total time= 4.5min
+[CV 1/5] END ....C=0.1, gamma=scale, kernel=rbf;, score=0.298 total time= 4.5min
+[CV 2/5] END ....C=0.1, gamma=scale, kernel=rbf;, score=0.279 total time= 4.5min
+[CV 3/5] END ....C=0.1, gamma=scale, kernel=rbf;, score=0.306 total time= 4.5min
+[CV 4/5] END ....C=0.1, gamma=scale, kernel=rbf;, score=0.261 total time= 4.5min
+[CV 5/5] END ....C=0.1, gamma=scale, kernel=rbf;, score=0.287 total time= 5.8min
+[CV 1/5] END ......C=1, gamma=0.001, kernel=rbf;, score=0.346 total time= 8.3min
+[CV 2/5] END ......C=1, gamma=0.001, kernel=rbf;, score=0.304 total time= 9.3min
+[CV 3/5] END ......C=1, gamma=0.001, kernel=rbf;, score=0.333 total time= 9.2min
+[CV 4/5] END ......C=1, gamma=0.001, kernel=rbf;, score=0.294 total time=10.1min
+[CV 5/5] END ......C=1, gamma=0.001, kernel=rbf;, score=0.309 total time= 7.5min
+[CV 1/5] END .....C=1, gamma=0.0001, kernel=rbf;, score=0.313 total time= 8.3min
+[CV 2/5] END .....C=1, gamma=0.0001, kernel=rbf;, score=0.295 total time= 8.3min
+[CV 3/5] END .....C=1, gamma=0.0001, kernel=rbf;, score=0.304 total time= 6.8min
+[CV 4/5] END .....C=1, gamma=0.0001, kernel=rbf;, score=0.284 total time= 9.2min
+[CV 5/5] END .....C=1, gamma=0.0001, kernel=rbf;, score=0.303 total time= 8.4min
+[CV 1/5] END ......C=1, gamma=scale, kernel=rbf;, score=0.375 total time=10.1min
+[CV 2/5] END ......C=1, gamma=scale, kernel=rbf;, score=0.347 total time= 8.4min
+[CV 3/5] END ......C=1, gamma=scale, kernel=rbf;, score=0.364 total time= 5.1min
+[CV 4/5] END ......C=1, gamma=scale, kernel=rbf;, score=0.323 total time= 6.7min
+[CV 5/5] END ......C=1, gamma=scale, kernel=rbf;, score=0.342 total time= 7.3min
+[CV 1/5] END .....C=10, gamma=0.001, kernel=rbf;, score=0.379 total time= 9.0min
+[CV 2/5] END .....C=10, gamma=0.001, kernel=rbf;, score=0.347 total time= 5.1min
+[CV 3/5] END .....C=10, gamma=0.001, kernel=rbf;, score=0.367 total time= 5.1min
+[CV 4/5] END .....C=10, gamma=0.001, kernel=rbf;, score=0.330 total time= 5.7min
+[CV 5/5] END .....C=10, gamma=0.001, kernel=rbf;, score=0.345 total time= 8.3min
+[CV 1/5] END ....C=10, gamma=0.0001, kernel=rbf;, score=0.475 total time= 8.3min
+[CV 2/5] END ....C=10, gamma=0.0001, kernel=rbf;, score=0.441 total time= 7.4min
+[CV 3/5] END ....C=10, gamma=0.0001, kernel=rbf;, score=0.471 total time= 6.0min
+[CV 4/5] END ....C=10, gamma=0.0001, kernel=rbf;, score=0.465 total time= 7.4min
+[CV 5/5] END ....C=10, gamma=0.0001, kernel=rbf;, score=0.464 total time= 7.9min
+[CV 1/5] END .....C=10, gamma=scale, kernel=rbf;, score=0.456 total time= 4.9min
+[CV 2/5] END .....C=10, gamma=scale, kernel=rbf;, score=0.427 total time= 6.6min
+[CV 3/5] END .....C=10, gamma=scale, kernel=rbf;, score=0.454 total time= 8.2min
+[CV 4/5] END .....C=10, gamma=scale, kernel=rbf;, score=0.443 total time= 7.3min
+[CV 5/5] END .....C=10, gamma=scale, kernel=rbf;, score=0.426 total time= 7.3min
+[CV 1/5] END ....C=100, gamma=0.001, kernel=rbf;, score=0.379 total time= 6.5min
+[CV 2/5] END ....C=100, gamma=0.001, kernel=rbf;, score=0.347 total time= 9.0min
+[CV 3/5] END ....C=100, gamma=0.001, kernel=rbf;, score=0.367 total time= 9.9min
+[CV 4/5] END ....C=100, gamma=0.001, kernel=rbf;, score=0.330 total time= 4.7min
+[CV 5/5] END ....C=100, gamma=0.001, kernel=rbf;, score=0.345 total time= 4.6min
+[CV 1/5] END ...C=100, gamma=0.0001, kernel=rbf;, score=0.475 total time= 4.6min
+[CV 2/5] END ...C=100, gamma=0.0001, kernel=rbf;, score=0.438 total time= 4.6min
+[CV 3/5] END ...C=100, gamma=0.0001, kernel=rbf;, score=0.472 total time= 4.6min
+[CV 4/5] END ...C=100, gamma=0.0001, kernel=rbf;, score=0.464 total time= 4.6min
+[CV 5/5] END ...C=100, gamma=0.0001, kernel=rbf;, score=0.465 total time= 4.6min
+[CV 1/5] END ....C=100, gamma=scale, kernel=rbf;, score=0.456 total time= 4.6min
+[CV 2/5] END ....C=100, gamma=scale, kernel=rbf;, score=0.427 total time= 4.6min
+[CV 3/5] END ....C=100, gamma=scale, kernel=rbf;, score=0.454 total time= 4.6min
+[CV 4/5] END ....C=100, gamma=scale, kernel=rbf;, score=0.443 total time= 4.6min
+[CV 5/5] END ....C=100, gamma=scale, kernel=rbf;, score=0.426 total time= 4.6min
+Model: fisher_matrix_k256_hyperparameter_svm_rbf.model, Time Lapse: 24670.62 seconds
+

@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 
 from algorithms_keypoints_descriptors import execSift, readImage
-from fisher_matrix import loadImages, getFisherVector
+from fisher_matrix import getFisherVector, loadImages
 from my_faiss import buildIndex, loadIndex, saveIndex
 from my_neo4j import Neo4jClient, Neo4jServer
 
@@ -27,7 +27,7 @@ def preProcess():
     fisher_vectors = list()
     for img in images:
         if img.descriptors is not None:
-            des =  np.array(img.descriptors)
+            des = np.array(img.descriptors)
             fisher_vector = getFisherVector(des, best_svm)
             fisher_vectors.append(fisher_vector)
             nodes.append({"filename": img.filename, "vector": fisher_vector})

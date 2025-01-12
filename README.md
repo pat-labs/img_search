@@ -1,6 +1,6 @@
 # Recipe
 
-    1. Extract features (ORB)
+    1. Extract features (SIFT)
     2. Load model
     3. Create faiss index
     4. query
@@ -23,4 +23,4 @@
 
 # Dataset
 
-https://www.kaggle.com/datasets/imsparsh/flowers-dataset?resource=download
+[] (flowers)[https://www.kaggle.com/datasets/imsparsh/flowers-dataset]
