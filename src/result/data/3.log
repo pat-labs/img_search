@@ -1,0 +1,185 @@
+==========
+Total number of images: 2746
+classes: {'dandelion', 'rose', 'sunflower', 'daisy', 'tulip'}
+Sample of Data
+                                          image_path  label
+0  asset\flower\train\daisy\10140303196_b88d3d6ce...  daisy
+1  asset\flower\train\daisy\10172379554_b296050f8...  daisy
+2  asset\flower\train\daisy\10172567486_2748826a8...  daisy
+3  asset\flower\train\daisy\10172636503_21bededa7...  daisy
+4  asset\flower\train\daisy\10391248763_1d1668110...  daisy
+Train set size: 2196
+Test set size: 550
+Data successfully split into training and testing sets.
+Title: fisher_matrix_k128_hyperparameter_linear_svc.model
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\mixture\_base.py:270: ConvergenceWarning: Best performing initialization did not converge. Try different init parameters, or increase max_iter, tol, or check for degenerate data.
+  warnings.warn(
+Fitting 5 folds for each of 15 candidates, totalling 75 fits
+[CV 5/5] END .............C=0.01, max_iter=1000;, score=0.428 total time= 3.2min
+[CV 5/5] END .............C=0.01, max_iter=5000;, score=0.428 total time= 3.6min
+[CV 5/5] END ............C=0.01, max_iter=10000;, score=0.428 total time= 3.6min
+[CV 3/5] END ............C=0.01, max_iter=10000;, score=0.453 total time= 6.7min
+[CV 1/5] END ............C=0.01, max_iter=10000;, score=0.448 total time= 7.1min
+[CV 3/5] END .............C=0.01, max_iter=5000;, score=0.453 total time= 7.1min
+[CV 2/5] END .............C=0.01, max_iter=5000;, score=0.435 total time= 7.2min
+[CV 4/5] END ............C=0.01, max_iter=10000;, score=0.446 total time= 7.3min
+[CV 3/5] END .............C=0.01, max_iter=1000;, score=0.453 total time= 7.4min
+[CV 4/5] END .............C=0.01, max_iter=1000;, score=0.446 total time= 7.4min
+[CV 1/5] END .............C=0.01, max_iter=1000;, score=0.448 total time= 7.6min
+[CV 2/5] END .............C=0.01, max_iter=1000;, score=0.435 total time= 7.7min
+[CV 4/5] END .............C=0.01, max_iter=5000;, score=0.446 total time= 7.7min
+[CV 1/5] END .............C=0.01, max_iter=5000;, score=0.448 total time= 8.2min
+[CV 2/5] END ............C=0.01, max_iter=10000;, score=0.435 total time= 8.5min
+[CV 5/5] END ..............C=0.1, max_iter=5000;, score=0.433 total time=12.5min
+[CV 5/5] END ..............C=0.1, max_iter=1000;, score=0.433 total time=19.3min
+[CV 5/5] END .............C=0.1, max_iter=10000;, score=0.433 total time=19.5min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ..............C=0.1, max_iter=1000;, score=0.443 total time=37.2min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ..............C=0.1, max_iter=1000;, score=0.458 total time=35.1min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ..............C=0.1, max_iter=1000;, score=0.442 total time=37.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ..............C=0.1, max_iter=1000;, score=0.431 total time=37.7min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ................C=1, max_iter=1000;, score=0.428 total time=35.4min
+[CV 2/5] END .............C=0.1, max_iter=10000;, score=0.431 total time=50.6min
+[CV 2/5] END ..............C=0.1, max_iter=5000;, score=0.431 total time=51.4min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ................C=1, max_iter=1000;, score=0.442 total time=32.3min
+[CV 4/5] END ..............C=0.1, max_iter=5000;, score=0.442 total time=54.0min
+[CV 4/5] END .............C=0.1, max_iter=10000;, score=0.442 total time=54.4min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ................C=1, max_iter=1000;, score=0.443 total time=54.4min
+[CV 1/5] END .............C=0.1, max_iter=10000;, score=0.443 total time=55.5min
+[CV 3/5] END ..............C=0.1, max_iter=5000;, score=0.458 total time=56.1min
+[CV 1/5] END ..............C=0.1, max_iter=5000;, score=0.443 total time=57.3min
+[CV 3/5] END .............C=0.1, max_iter=10000;, score=0.458 total time=57.4min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ................C=1, max_iter=1000;, score=0.465 total time=52.4min
+[CV 5/5] END ...............C=10, max_iter=1000;, score=0.433 total time= 1.2min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ...............C=10, max_iter=1000;, score=0.443 total time=24.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ...............C=10, max_iter=1000;, score=0.426 total time=24.1min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ...............C=10, max_iter=1000;, score=0.440 total time=22.2min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ...............C=10, max_iter=1000;, score=0.458 total time=24.7min
+[CV 5/5] END ...............C=10, max_iter=5000;, score=0.433 total time= 1.2min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 5/5] END ................C=1, max_iter=1000;, score=0.433 total time=53.7min
+[CV 5/5] END ................C=1, max_iter=5000;, score=0.433 total time=56.4min
+[CV 5/5] END ...............C=1, max_iter=10000;, score=0.433 total time=78.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ...............C=1, max_iter=5000;, score=0.428 total time=123.8min
+[CV 5/5] END ..............C=10, max_iter=10000;, score=0.433 total time= 1.2min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ...............C=1, max_iter=5000;, score=0.442 total time=119.8min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ..............C=100, max_iter=1000;, score=0.443 total time=25.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ...............C=1, max_iter=5000;, score=0.460 total time=150.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ..............C=10, max_iter=5000;, score=0.443 total time=116.4min
+[CV 5/5] END ..............C=100, max_iter=1000;, score=0.433 total time= 1.1min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ..............C=10, max_iter=5000;, score=0.462 total time=110.7min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ..............C=10, max_iter=5000;, score=0.440 total time=111.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ..............C=100, max_iter=1000;, score=0.431 total time=23.9min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ..............C=10, max_iter=5000;, score=0.426 total time=112.5min
+[CV 5/5] END ..............C=100, max_iter=5000;, score=0.433 total time= 1.3min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ...............C=1, max_iter=5000;, score=0.443 total time=165.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ..............C=100, max_iter=1000;, score=0.444 total time=22.3min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ..............C=100, max_iter=1000;, score=0.462 total time=24.5min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ..............C=1, max_iter=10000;, score=0.442 total time=217.5min
+[CV 5/5] END .............C=100, max_iter=10000;, score=0.433 total time= 1.1min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ..............C=1, max_iter=10000;, score=0.428 total time=230.9min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END .............C=100, max_iter=5000;, score=0.426 total time=103.7min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END .............C=100, max_iter=5000;, score=0.456 total time=103.8min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END .............C=100, max_iter=5000;, score=0.440 total time=104.3min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END .............C=100, max_iter=5000;, score=0.443 total time=106.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END .............C=10, max_iter=10000;, score=0.426 total time=213.8min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END .............C=10, max_iter=10000;, score=0.443 total time=214.6min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ..............C=1, max_iter=10000;, score=0.462 total time=246.6min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ..............C=1, max_iter=10000;, score=0.443 total time=250.9min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END .............C=10, max_iter=10000;, score=0.462 total time=198.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END .............C=10, max_iter=10000;, score=0.442 total time=176.4min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 2/5] END ............C=100, max_iter=10000;, score=0.428 total time=125.9min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 1/5] END ............C=100, max_iter=10000;, score=0.441 total time=129.2min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 4/5] END ............C=100, max_iter=10000;, score=0.437 total time=115.8min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+[CV 3/5] END ............C=100, max_iter=10000;, score=0.462 total time=118.0min
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+C:\Users\pa-tr\AppData\Roaming\Python\Python312\site-packages\sklearn\svm\_base.py:1235: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+Model: fisher_matrix_k128_hyperparameter_linear_svc.model, Time Lapse: 20583.17 seconds
