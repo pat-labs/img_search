@@ -31,3 +31,4 @@ typing-extensions
 tzdata
 seaborn
 tensorflow
+psutil

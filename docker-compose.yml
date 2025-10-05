@@ -3,7 +3,7 @@ services:
     container_name: ${APP_HOST:-img_search}
     build: .
     volumes:
-      - ./src/:/home/app/src/
+      - ./src_old/:/home/app/src_old/
     networks:
       - public
       

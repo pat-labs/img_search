@@ -36,7 +36,7 @@ FROM python:3.10.14-slim
 ENV APP_HOME=/home/app
 RUN mkdir -p $APP_HOME
 COPY ./entrypoint.sh / $APP_HOME
-COPY ./src $APP_HOME/src
+COPY src_old $APP_HOME/src
 RUN chmod -R 777 $APP_HOME
 
 # install dependencies

@@ -1,2 +1,26 @@
-src/asset/*
-src/model/*
+src_old/asset/*
+src_old/model/*
+/asset/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
