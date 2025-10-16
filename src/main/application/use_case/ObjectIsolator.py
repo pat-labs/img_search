@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 from dataclasses import dataclass
 
+from src.main.application.use_case.ImageUtil import ImageUtil
+
+
 @dataclass
 class BoundingBox:
     x: int
@@ -10,9 +13,10 @@ class BoundingBox:
     height: int
 
 class ObjectIsolator:
-    def isolate_object(self, image_path: str) -> BoundingBox | None:
+    @staticmethod
+    def isolate_object(image_path: str) -> BoundingBox | None:
         try:
-            img = cv2.imread(image_path)
+            img = ImageUtil.load_image_paths_and_labels(image_path)
             if img is None:
                 print(f"Error: Could not load image from {image_path}")
                 return None

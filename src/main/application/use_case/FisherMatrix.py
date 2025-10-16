@@ -1,9 +1,13 @@
 import cv2
 import numpy as np
 from enum import Enum
+import pickle
+import os
 
+from src.main.application.use_case.ClassifierType import ClassifierType
+from src.main.application.use_case.ImageDescriptorAnalyzer import DescriptorType
 from src.main.application.use_case.ImageUtil import PathLabel, ImageUtil
-
+from io import BytesIO
 
 class KNodes(Enum):
     K16 = 16
@@ -12,52 +16,129 @@ class KNodes(Enum):
     K128 = 128
     K256 = 256
 
-
 class FisherMatrix:
-    SIFT_DESCRIPTOR_DIMENSION = 128
     MAX_DESCRIPTORS_FOR_GMM = 1_000_000
     GMM_MAX_ITER = 100
     GMM_EPSILON = 0.1
     NORMALIZATION_EPSILON = 1e-6
 
-    def __init__(self, k: KNodes):
+    def __init__(self, k: KNodes, 
+                 descriptor_type: DescriptorType, 
+                 classifier_type: ClassifierType):
         self.k = k.value
+        self.descriptor_type = descriptor_type
+        self.classifier_type = classifier_type
         self.gmm = None
-        self.sift = cv2.SIFT_create()
+        self.classifier = self.classifier_type.create_classifier()
+        self.label_map = None
+        self.descriptor = self.descriptor_type.create_descriptor()
+        self.descriptor_dimension = self.descriptor.descriptorSize()
 
-    def create(self, train_data: PathLabel):
-        descriptors = self._get_descriptors(train_data)
-        if descriptors is not None:
-            prepped_descriptors = self._prepare_descriptors_for_gmm(descriptors)
-            self._train_gmm(prepped_descriptors)
-
-    def _get_descriptors(self, data: PathLabel):
-        print("Extracting SIFT features...")
-        all_descriptors = []
-        for i, (image_path, _) in enumerate(data):
-            try:
-                img = ImageUtil.load_grayscale_image(image_path)
-                _, descriptors = self.sift.detectAndCompute(img, None)
-                if descriptors is not None:
-                    all_descriptors.append(descriptors)
-                if (i + 1) % 100 == 0:
-                    print(f"  Processed {i + 1}/{len(data)} images")
-            except Exception as e:
-                print(f"Error processing {image_path}: {e}")
-
-        if not all_descriptors:
-            print("No descriptors found.")
-            return None
-        return all_descriptors
-
-    def _prepare_descriptors_for_gmm(self, descriptors):
-        print("Stacking and sampling descriptors...")
-        all_descriptors = np.vstack(descriptors)
+    def train(self, train_data: list[PathLabel], precomputed_descriptors: list[np.ndarray]):
+        print(f"Starting training with {self.descriptor_type.name} and {self.classifier_type.name}...")
+        all_descriptors = np.vstack(precomputed_descriptors)
         if len(all_descriptors) > self.MAX_DESCRIPTORS_FOR_GMM:
             print(f"Found {len(all_descriptors)} descriptors, using a random subset of {self.MAX_DESCRIPTORS_FOR_GMM}.")
             np.random.shuffle(all_descriptors)
             all_descriptors = all_descriptors[:self.MAX_DESCRIPTORS_FOR_GMM]
-        return all_descriptors.astype(np.float32)
+        self._train_gmm(all_descriptors)
+
+        print("Encoding training data into Fisher Vectors...")
+        fisher_vectors, labels = self.encode(train_data)
+        if fisher_vectors is None or len(fisher_vectors) == 0:
+            print("Classifier training failed: Could not encode training data.")
+            return
+
+        print(f"Training the {self.classifier_type.name} classifier...")
+        label_map = {label: i for i, label in enumerate(np.unique(labels))}
+        self.label_map = {i: label for label, i in label_map.items()}
+        numerical_labels = np.array([label_map[label] for label in labels], dtype=np.int32)
+
+        self.classifier.train(fisher_vectors, cv2.ml.ROW_SAMPLE, numerical_labels)
+        print("Training complete.")
+
+    def predict(self, image_path: str) -> str | None:
+        if not self.is_trained():
+            print("Prediction failed: The model has not been trained yet.")
+            return None
+        
+        fv = self._process_single_image(image_path)
+        fv = np.array([fv], dtype=np.float32)
+
+        _, result = self.classifier.predict(fv)
+        predicted_label_index = int(result[0][0])
+        
+        return self.label_map.get(predicted_label_index, "Unknown")
+
+    def is_trained(self) -> bool:
+        return self.gmm is not None and self.classifier.isTrained()
+
+    def encode(self, image_data: list[PathLabel]) -> tuple[np.ndarray | None, np.ndarray | None]:
+        if self.gmm is None:
+            print("Model is not trained. Please call train() first.")
+            return None, None
+
+        fisher_vectors, labels = [], []
+        for item in image_data:
+            fv = self._process_single_image(item.path)
+            fisher_vectors.append(fv)
+            labels.append(item.label)
+
+        return np.array(fisher_vectors), np.array(labels)
+
+    def save_model(self, path: str):
+        if not self.is_trained():
+            print("Model has not been trained. Cannot save.")
+            return
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'wb') as f:
+            pickle.dump(self, f)
+        print(f"FisherMatrix model saved to {path}")
+
+    @staticmethod
+    def load_model(path: str):
+        try:
+            with open(path, 'rb') as f:
+                model = pickle.load(f)
+            print(f"FisherMatrix model loaded from {path}")
+            return model
+        except FileNotFoundError:
+            print(f"Error: Model file not found at {path}")
+            return None
+        except Exception as e:
+            print(f"An error occurred while loading the model: {e}")
+            return None
+
+    def __getstate__(self):
+        """Prepare the object for pickling, handling non-serializable attributes."""
+        state = self.__dict__.copy()
+        
+        # Remove the non-pickleable descriptor object
+        del state['descriptor']
+
+        # Serialize GMM and Classifier manually
+        if state['gmm'] is not None:
+            fs = cv2.FileStorage(".xml", cv2.FILE_STORAGE_WRITE | cv2.FILE_STORAGE_MEMORY)
+            state['gmm'].write(fs)
+            state['gmm'] = fs.release()
+
+        if state['classifier'] is not None and state['classifier'].isTrained():
+            fs = cv2.FileStorage(".xml", cv2.FILE_STORAGE_WRITE | cv2.FILE_STORAGE_MEMORY)
+            state['classifier'].write(fs)
+            state['classifier'] = fs.release()
+        else:
+            state['classifier'] = None
+
+        return state
+
+    def __setstate__(self, state):
+        """Restore the object after unpickling."""
+        self.__dict__.update(state)
+        
+        # Recreate the descriptor object
+        self.descriptor = self.descriptor_type.create_descriptor()
+        self.gmm = cv2.ml.EM_create().read(cv2.FileStorage(self.gmm, cv2.FILE_STORAGE_READ | cv2.FILE_STORAGE_MEMORY).getFirstTopLevelNode())
+        self.classifier = self.classifier_type.create_classifier().read(cv2.FileStorage(self.classifier, cv2.FILE_STORAGE_READ | cv2.FILE_STORAGE_MEMORY).getFirstTopLevelNode())
 
     def _train_gmm(self, descriptors):
         print(f"Training GMM with {self.k} components...")
@@ -73,38 +154,19 @@ class FisherMatrix:
         else:
             print("GMM training failed.")
 
-    def evaluate_model(self, test_data: PathLabel):
-        if self.gmm is None:
-            print("GMM model is not trained. Please call create() first.")
-            return None, None
-
-        print(f"Evaluating model on {len(test_data)} test images...")
-        fisher_vectors, labels = [], []
-        for i, (image_path, label) in enumerate(test_data):
-            fv = self._process_single_image_for_evaluation(image_path)
-            fisher_vectors.append(fv)
-            labels.append(label)
-            if (i + 1) % 50 == 0:
-                print(f"  Processed {i + 1}/{len(test_data)} images")
-
-        print("Evaluation complete.")
-        return np.array(fisher_vectors), np.array(labels)
-
-    def _process_single_image_for_evaluation(self, image_path: str):
+    def _process_single_image(self, image_path: str):
         try:
             img = ImageUtil.load_grayscale_image(image_path)
-            _, descriptors = self.sift.detectAndCompute(img, None)
+            _, descriptors = self.descriptor.detectAndCompute(img, None)
 
             if descriptors is None or len(descriptors) == 0:
-                print(f"Warning: No descriptors found for {image_path}")
-                fisher_vector_dimension = 2 * self.k * self.SIFT_DESCRIPTOR_DIMENSION
+                fisher_vector_dimension = 2 * self.k * self.descriptor_dimension
                 return np.zeros(fisher_vector_dimension, dtype=np.float32)
             
             return self._compute_fisher_vector(descriptors.astype(np.float32))
-
         except Exception as e:
-            print(f"Error evaluating image {image_path}: {e}")
-            fisher_vector_dimension = 2 * self.k * self.SIFT_DESCRIPTOR_DIMENSION
+            print(f"Error processing image {image_path}: {e}")
+            fisher_vector_dimension = 2 * self.k * self.descriptor_dimension
             return np.zeros(fisher_vector_dimension, dtype=np.float32)
 
     def _compute_fisher_vector(self, descriptors):
@@ -131,51 +193,26 @@ class FisherMatrix:
 
     def _calculate_mean_gradient(self, descriptors, means, std_devs, weights, posteriors):
         num_descriptors = descriptors.shape[0]
-        
-        descriptors_r = descriptors[:, np.newaxis, :]
-        means_r = means[np.newaxis, :, :]
-        std_devs_r = std_devs[np.newaxis, :, :]
-        posteriors_r = posteriors[:, :, np.newaxis]
-
-        diff = descriptors_r - means_r
-        normalized_diff = diff / std_devs_r
-        weighted_diff = posteriors_r * normalized_diff
-        
+        diff = descriptors[:, np.newaxis, :] - means[np.newaxis, :, :]
+        normalized_diff = diff / std_devs[np.newaxis, :, :]
+        weighted_diff = posteriors[:, :, np.newaxis] * normalized_diff
         sum_over_descriptors = np.sum(weighted_diff, axis=0)
-        
-        weights_r = weights[:, np.newaxis]
-        normalization_factor = num_descriptors * np.sqrt(weights_r)
-        
-        mean_gradient = sum_over_descriptors / normalization_factor
+        mean_gradient = sum_over_descriptors / (num_descriptors * np.sqrt(weights[:, np.newaxis]))
         return mean_gradient
 
     def _calculate_std_dev_gradient(self, descriptors, means, std_devs, weights, posteriors):
         num_descriptors = descriptors.shape[0]
-
-        descriptors_r = descriptors[:, np.newaxis, :]
-        means_r = means[np.newaxis, :, :]
-        std_devs_r = std_devs[np.newaxis, :, :]
-        posteriors_r = posteriors[:, :, np.newaxis]
-
-        diff = descriptors_r - means_r
-        normalized_term = ((diff / std_devs_r) ** 2) - 1
-        weighted_term = posteriors_r * normalized_term
-        
+        diff_sq = ((descriptors[:, np.newaxis, :] - means[np.newaxis, :, :]) / std_devs[np.newaxis, :, :]) ** 2 - 1
+        weighted_term = posteriors[:, :, np.newaxis] * diff_sq
         sum_over_descriptors = np.sum(weighted_term, axis=0)
-        
-        weights_r = weights[:, np.newaxis]
-        normalization_factor = num_descriptors * np.sqrt(2 * weights_r)
-        
-        std_dev_gradient = sum_over_descriptors / normalization_factor
+        std_dev_gradient = sum_over_descriptors / (num_descriptors * np.sqrt(2 * weights[:, np.newaxis]))
         return std_dev_gradient
 
     def _normalize_fisher_vector(self, fisher_vector):
         power_normalized_fv = np.sign(fisher_vector) * np.sqrt(np.abs(fisher_vector))
-        
         norm = np.linalg.norm(power_normalized_fv)
         if norm > self.NORMALIZATION_EPSILON:
             l2_normalized_fv = power_normalized_fv / norm
         else:
             l2_normalized_fv = power_normalized_fv
-            
         return l2_normalized_fv

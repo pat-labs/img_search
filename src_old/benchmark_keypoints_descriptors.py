@@ -152,7 +152,7 @@ def plotPerformanceAlgoprithm(data_path):
         barPlot(
             [float(item[4]) for item in data],
             [str(item[2]) for item in data],
-            "Performance algorithm: " + labels[i],
+            "Performance descriptor_type: " + labels[i],
             "Type (image)",
             "Time (ms)",
             ["Features"],

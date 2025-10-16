@@ -1,8 +1,13 @@
-import dataclasses
-from typing import List
+from dataclasses import dataclass
 
 import cv2 as cv
 import os
+
+@dataclass
+class PathLabel:
+    path: str
+    label: str
+
 
 class ImageUtil:
 
@@ -14,22 +19,22 @@ class ImageUtil:
         return image
 
     @staticmethod
-    def flip_image_horizontally(image):
+    def _flip_image_horizontally(image):
         return cv.flip(image, 1)
 
     @staticmethod
-    def flip_image_vertically(image):
+    def _flip_image_vertically(image):
         return cv.flip(image, 0)
 
     @staticmethod
-    def rotate_image(image, angle):
+    def _rotate_image(image, angle):
         (height, width) = image.shape[:2]
         center = (width // 2, height // 2)
         rotation_matrix = cv.getRotationMatrix2D(center, angle, 1.0)
         return cv.warpAffine(image, rotation_matrix, (width, height))
 
     @staticmethod
-    def change_brightness(image, value):
+    def _change_brightness(image, value):
         hsv = cv.cvtColor(cv.cvtColor(image, cv.COLOR_GRAY2BGR), cv.COLOR_BGR2HSV)
         h, s, v = cv.split(hsv)
         v = cv.add(v, value)
@@ -48,7 +53,7 @@ class ImageUtil:
             if os.path.isdir(class_dir):
                 for image_name in os.listdir(class_dir):
                     image_path = os.path.join(class_dir, image_name)
-                    image_paths_and_labels.append({image_path: class_label})
+                    image_paths_and_labels.append(PathLabel(path=image_path, label=class_label))
         return image_paths_and_labels
 
     @staticmethod
@@ -56,29 +61,38 @@ class ImageUtil:
         try:
             original_image = ImageUtil.load_grayscale_image(image_path)
             base_filename, ext = os.path.splitext(os.path.basename(image_path))
-            os.makedirs(result_path, exist_ok=True)
 
             transformations = {
-                "rotation_15": (ImageUtil.rotate_image, 15),
-                "rotation_45": (ImageUtil.rotate_image, 45),
-                "rotation_90": (ImageUtil.rotate_image, 90),
-                "brightness_negative_25": (ImageUtil.change_brightness, -25),
-                "brightness_25": (ImageUtil.change_brightness, 25),
-                "brightness_50": (ImageUtil.change_brightness, 50),
-                "flip_horizontal": (ImageUtil.flip_image_horizontally, None),
-                "flip_vertical": (ImageUtil.flip_image_vertically, None)
+                "rotation": {
+                    "rotation_15": (ImageUtil._rotate_image, 15),
+                    "rotation_45": (ImageUtil._rotate_image, 45),
+                    "rotation_90": (ImageUtil._rotate_image, 90)
+                },
+                "brightness": {
+                    "brightness_negative_25": (ImageUtil._change_brightness, -25),
+                    "brightness_25": (ImageUtil._change_brightness, 25),
+                    "brightness_50": (ImageUtil._change_brightness, 50)
+                },
+                "flip": {
+                    "flip_horizontal": (ImageUtil._flip_image_horizontally, None),
+                    "flip_vertical": (ImageUtil._flip_image_vertically, None)
+                }
             }
 
-            for suffix, (transform_func, value) in transformations.items():
-                if value is not None:
-                    transformed_image = transform_func(original_image, value)
-                else:
-                    transformed_image = transform_func(original_image)
-                
-                output_filename = f"{base_filename}_{suffix}{ext}"
-                output_path = os.path.join(result_path, output_filename)
-                cv.imwrite(output_path, transformed_image)
-                print(f"Saved {output_path}")
+            os.makedirs(result_path, exist_ok=True)
+            for folder, funcs in transformations.items():
+                folder_path = os.path.join(result_path, folder)
+                os.makedirs(folder_path, exist_ok=True)
+                for suffix, (transform_func, value) in funcs.items():
+                    if value is not None:
+                        transformed_image = transform_func(original_image, value)
+                    else:
+                        transformed_image = transform_func(original_image)
+
+                    output_filename = f"{base_filename}_{suffix}{ext}"
+                    output_path = os.path.join(result_path, output_filename)
+                    cv.imwrite(output_path, transformed_image)
+                    print(f"Saved {output_path}")
 
         except Exception as e:
             print(f"An error occurred: {e}")

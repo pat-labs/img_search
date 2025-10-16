@@ -1,5 +1,3 @@
-src_old/asset/*
-src_old/model/*
 /asset/
 
 # Python artifacts
@@ -24,3 +22,4 @@ venv/
 .vscode/
 *.swp
 *.swo
+/src_old/

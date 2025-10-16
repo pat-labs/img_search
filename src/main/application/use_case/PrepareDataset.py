@@ -5,7 +5,7 @@ import numpy as np
 from src.main.application.use_case.ImageUtil import ImageUtil
 
 
-class PreProcessDataset:
+class PrepareDataset:
     def __init__(self, dataset_path: str):
         self.dataset_path = dataset_path
         self.train_dir = os.path.join(self.dataset_path, "train")
@@ -24,36 +24,6 @@ class PreProcessDataset:
         print(f"Number of testing images: {size}")
         return size
 
-    @staticmethod
-    def noise_reduction(image):
-        return cv2.GaussianBlur(image, (5, 5), 0)
-
-    @staticmethod
-    def normalize(image):
-        norm_img = np.zeros_like(image, dtype=np.uint8)
-        return cv2.normalize(image, norm_img, 0, 255, cv2.NORM_MINMAX)
-
-    @staticmethod
-    def contrast_enhancement(image):
-        if len(image.shape) == 3 and image.shape[2] == 3:  # HSV image
-            h, s, v = cv2.split(image)
-            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-            enhanced_v = clahe.apply(v)
-            enhanced_hsv = cv2.merge([h, s, enhanced_v])
-            return enhanced_hsv
-        else:  # Grayscale image
-            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-            return clahe.apply(image)
-
-    @staticmethod
-    def binarize(image):
-        if len(image.shape) == 3:
-            gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        else:
-            gray_image = image
-        _, binary_image = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
-        return binary_image
-
     def sanitize_dataset(self, image_size=(224, 224)):
         if not os.path.exists(self.sanitized_dataset_path):
             os.makedirs(self.sanitized_dataset_path)
@@ -69,7 +39,7 @@ class PreProcessDataset:
 
             for image_path, class_label in image_paths_and_labels:
                 try:
-                    img = ImageUtil.load_grayscale_image(image_path)
+                    img = ImageUtil._load_grayscale_image(image_path)
 
                     resized_img = cv2.resize(img, image_size)
                     denoised_img = self.noise_reduction(resized_img)

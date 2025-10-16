@@ -140,7 +140,7 @@ def stitch_two_images(
         kp1, des1 = freak.compute(image1, kp1)
         kp2, des2 = freak.compute(image2, kp2)
     else:
-        raise ValueError("Invalid detect algorithm selection")
+        raise ValueError("Invalid detect descriptor_type selection")
 
     # Apply ratio test
     if matcher_algorithm == MatcherAlgorithm.BF:
@@ -150,7 +150,7 @@ def stitch_two_images(
         flann = cv.DescriptorMatcher_create(cv.DescriptorMatcher_FLANNBASED)
         matches = flann.knnMatch(np.float32(des1), np.float32(des2), 2)
     else:
-        raise ValueError("Invalid matcher algorithm selection")
+        raise ValueError("Invalid matcher descriptor_type selection")
 
     len_matcher = len(matches)
     # Apply ratio test
