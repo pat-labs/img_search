@@ -1,12 +1,14 @@
-import unittest
 import os
-import tempfile
 import shutil
-import numpy as np
+import tempfile
+import unittest
+
 import cv2
+import numpy as np
 
 from src.main.application.use_case.FileHandler import FileHandler
 from src.main.application.use_case.ImageUtil import ImageUtil
+
 
 class TestImageUtil(unittest.TestCase):
 
@@ -36,7 +38,7 @@ class TestImageUtil(unittest.TestCase):
         generated_files = FileHandler.find_files_by_name(result_path, image_name)
         generated_files_name = [os.path.basename(file) for file in generated_files]
 
-        self.assertEqual(len(generated_files_name), 8)
+        self.assertEqual(len(generated_files_name), 12)
 
         expected_suffixes = [
             "_rotation_15.png",
@@ -53,7 +55,7 @@ class TestImageUtil(unittest.TestCase):
             self.assertIn(base_filename + suffix, generated_files_name)
 
     def test_load_image_paths_and_labels(self):
-        paths_and_labels = ImageUtil.load_image_paths_and_labels(self.dataset_path)
+        paths_and_labels = ImageUtil.load_image_data_from_folder(self.dataset_path)
 
         self.assertEqual(len(paths_and_labels), 2)
 
@@ -70,6 +72,7 @@ class TestImageUtil(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             ImageUtil.load_grayscale_image("non_existent_file.png")
+
 
 if __name__ == '__main__':
     unittest.main()

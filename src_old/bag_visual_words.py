@@ -128,7 +128,7 @@ def knn(base_images: List[ImageData], target_images: List[ImageData]) -> None:
 
 
 def main() -> None:
-    # Data path
+    # Data file_path
     data_dir = Path(train_data_dir)
     if not os.path.exists(data_dir):
         raise FileNotFoundError(f"Directory not found: {data_dir}")

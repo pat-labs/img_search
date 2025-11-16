@@ -1,13 +1,16 @@
-import time
-import psutil
 import os
+import time
 from dataclasses import dataclass
 from typing import Callable
+
+import psutil
+
 
 @dataclass
 class PerformanceResult:
     memory_usage_mb: float
-    execution_time_hours: float
+    execution_time_seconds: float
+
 
 class PerformanceAnalyzer:
 
@@ -22,10 +25,10 @@ class PerformanceAnalyzer:
         end_time = time.time()
         end_mem = process.memory_info().rss
 
-        execution_time_hours = (end_time - start_time) / 3600
+        execution_time_seconds = end_time - start_time
         memory_usage_mb = (end_mem - start_mem) / (1024 * 1024)
 
         return result, PerformanceResult(
             memory_usage_mb=memory_usage_mb,
-            execution_time_hours=execution_time_hours
+            execution_time_seconds=execution_time_seconds
         )

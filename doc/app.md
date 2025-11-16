@@ -2,7 +2,7 @@
 
 ## Ingredients
 
-- **Descriptors**: SIFT, ORB, KAZE, AKAZE, BRISK, SIFT-FREAK
+- **Descriptors**: SIFT, ORB, KAZE, AKAZE, BRISK, [SIFT-FREAK]
 - **Clustering Methods**: Bag of Words (BoW), Fisher Matrix
 - **Indexing Options**: FAISS, Annoy (Approximate Nearest Neighbors Oh Yeah), HNSW (Hierarchical Navigable Small Worlds), Approximate Nearest Neighbor (ANN)
 - **Databases**: Neo4j, Milvus, Weaviate, Pinecone, Chroma

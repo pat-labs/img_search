@@ -1,9 +1,10 @@
-import unittest
 import os
-import tempfile
 import shutil
+import tempfile
+import unittest
 
 from src.main.application.use_case.FileHandler import FileHandler
+
 
 class TestFileHandler(unittest.TestCase):
 
@@ -37,6 +38,7 @@ class TestFileHandler(unittest.TestCase):
         self.assertEqual(len(found_files), 2)
         self.assertIn(os.path.join(self.test_dir, "report_2023.txt"), found_files)
         self.assertIn(os.path.join(subdir, "final_report.doc"), found_files)
+
 
 if __name__ == '__main__':
     unittest.main()

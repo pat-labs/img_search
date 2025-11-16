@@ -572,7 +572,7 @@ def plot_rgb_histogram(classes, dataframe):
 
 
 def pre_procesing():
-    # Data path
+    # Data file_path
     data_dir = Path(train_data_dir)
     if not os.path.exists(data_dir):
         raise FileNotFoundError(f"Directory not found: {data_dir}")

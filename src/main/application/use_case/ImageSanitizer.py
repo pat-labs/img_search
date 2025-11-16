@@ -1,5 +1,10 @@
+import os
+from typing import Tuple
+
 import cv2
 import numpy as np
+
+from src.main.application.use_case.ImageUtil import ImageUtil
 
 
 class ImageSanitizer:
@@ -33,20 +38,41 @@ class ImageSanitizer:
         _, binary_image = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
         return binary_image
 
-    def sanitize(img: np.array, image_size=(224, 224)):
+    @staticmethod
+    def sanitize(img: np.ndarray, image_size: Tuple[int, int] = (224, 224)) -> np.ndarray:
         try:
+            if len(img.shape) == 3:  # If not grayscale, convert it
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
             resized_img = cv2.resize(img, image_size)
-            denoised_img = self.noise_reduction(resized_img)
-            hsv_img = cv2.cvtColor(denoised_img, cv2.COLOR_BGR2HSV)
-            enhanced_img = self.contrast_enhancement(hsv_img)
-            normalized_img = self.normalize(enhanced_img)
-
-            target_class_dir = os.path.join(sanitized_dataset_type_path, class_label)
-            if not os.path.exists(target_class_dir):
-                os.makedirs(target_class_dir)
-
-            image_name = os.path.basename(image_path)
-            sanitized_image_path = os.path.join(target_class_dir, image_name)
-            cv2.imwrite(sanitized_image_path, normalized_img)
+            denoised_img = ImageSanitizer.noise_reduction(resized_img)
+            enhanced_img = ImageSanitizer.contrast_enhancement(denoised_img)
+            normalized_img = ImageSanitizer.normalize(enhanced_img)
+            return normalized_img
         except Exception as e:
-            print(f"Error processing image {img}: {e}")
+            print(f"Error sanitizing image: {e}")
+            raise
+
+    @staticmethod
+    def sanitize_dataset(image_paths_and_labels, sanitized_dataset_path, image_size=(224, 224)):
+        if not os.path.exists(sanitized_dataset_path):
+            os.makedirs(sanitized_dataset_path)
+
+        for image in image_paths_and_labels:
+            try:
+                img = ImageUtil.load_grayscale_image(image.path)
+                diffused_img = cv2.ximgproc.anisotropicDiffusion(img, alpha=0.15, K=30, niters=10)
+                diffused_img = (diffused_img * 255).astype(np.uint8)
+
+                resized_img = cv2.resize(diffused_img, image_size)
+                denoised_img = ImageSanitizer.noise_reduction(resized_img)
+                enhanced_img = ImageSanitizer.contrast_enhancement(denoised_img)
+                normalized_img = ImageSanitizer.normalize(enhanced_img) # Normalization should be the last step
+
+                image_name = os.path.basename(image.path)
+                sanitized_image_path = os.path.join(sanitized_dataset_path, image_name)
+                cv2.imwrite(sanitized_image_path, normalized_img)
+            except Exception as e:
+                print(f"Error processing image {image.path}: {e}")
+
+        print("Dataset sanitization complete.")
