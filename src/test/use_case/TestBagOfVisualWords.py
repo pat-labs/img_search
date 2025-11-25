@@ -32,7 +32,7 @@ class TestBagOfVisualWords(unittest.TestCase):
 
         query_image = images_data[0]
         feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-        desc = feature.descriptor
+        desc = feature.descriptors
         prediction = bovw.predict(desc)
         self.assertEqual(prediction, query_image.label)
 
@@ -42,7 +42,7 @@ class TestBagOfVisualWords(unittest.TestCase):
 
         query_image = images_data[1]
         feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-        desc = feature.descriptor
+        desc = feature.descriptors
         prediction = bovw.predict(desc)
         self.assertEqual(prediction, query_image.label)
 

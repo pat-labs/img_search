@@ -34,7 +34,7 @@ class TestKmeans(unittest.TestCase):
 
         query_image = images_data[0]
         feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-        desc = feature.descriptor
+        desc = feature.descriptors
         predictions = kmeans.predict(desc)
         self.assertEqual(len(predictions), len(desc))
         self.assertTrue(all(0 <= p < k_nodes.value for p in predictions))

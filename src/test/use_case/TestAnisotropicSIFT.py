@@ -6,7 +6,7 @@ import unittest
 import cv2
 import numpy as np
 
-from src.main.application.use_case.AnisotropicSIFT import computeKeypointsAndDescriptors
+from src.main.application.use_case.AnisotropicSIFT import anisotropicSiftComputeKeypointsAndDescriptors
 from src.main.application.use_case.ImageUtil import ImageUtil
 
 
@@ -30,7 +30,7 @@ class TestAnisotropicSIFT(unittest.TestCase):
     def test_sift(self):
         """Test that keypoints and descriptors are generated correctly."""
         img = ImageUtil.load_grayscale_image(self.image_path)
-        keypoints, descriptors = computeKeypointsAndDescriptors(img)
+        keypoints, descriptors = anisotropicSiftComputeKeypointsAndDescriptors(img)
 
         # 1. Assert that keypoints and descriptors were found
         self.assertIsNotNone(keypoints)

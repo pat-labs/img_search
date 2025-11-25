@@ -41,8 +41,8 @@ class KMeans:
         raise ValueError(f"Unsupported feature algorithm: {self.descriptor_type.name}")
 
     def fit(self, train_data: List[ImageDataFeature], parallel: bool = True):
-        valid_desc = [item.descriptor for item in train_data if
-                      item.descriptor is not None and len(item.descriptor) > 0]
+        valid_desc = [item.descriptors for item in train_data if
+                      item.descriptors is not None and len(item.descriptors) > 0]
         if not valid_desc:
             raise ValueError("No valid descriptors provided for GMM training.")
 

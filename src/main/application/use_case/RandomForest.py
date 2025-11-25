@@ -90,7 +90,7 @@ class RandomForest:
             print("Prediction failed: The model has not been trained yet.")
             return None
 
-        # Predict the class for each descriptor and find the most common one (voting)
+        # Predict the class for each descriptors and find the most common one (voting)
         _, results = self.classifier.predict(descriptor.astype(np.float32))
         predicted_indices = [int(r[0]) for r in results]
 

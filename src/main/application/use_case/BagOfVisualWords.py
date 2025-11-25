@@ -65,8 +65,8 @@ class BagOfVisualWords:
             raise ValueError(f"Unsupported classifier type: {self.classifier_type.name}")
 
     def train(self, train_data: list[ImageDataFeature], parallel: bool = True):
-        valid_desc = [item.descriptor for item in train_data if
-                      item.descriptor is not None and len(item.descriptor) > 0]
+        valid_desc = [item.descriptors for item in train_data if
+                      item.descriptors is not None and len(item.descriptors) > 0]
         if not valid_desc:
             raise ValueError("No valid descriptors provided for GMM training.")
 
@@ -90,7 +90,7 @@ class BagOfVisualWords:
     def _compute_histogram_serial(self, train_data: list[ImageDataFeature]):
         histograms, labels = [], []
         for item in train_data:
-            hist = self._generate_histogram(item.descriptor)
+            hist = self._generate_histogram(item.descriptors)
             if hist is not None and hist.size > 0:
                 histograms.append(hist)
                 labels.append(item.label)
@@ -99,7 +99,7 @@ class BagOfVisualWords:
     def _compute_histogram_parallel(self, train_data: list[ImageDataFeature]):
         histograms, labels = [], []
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(self._generate_histogram, item.descriptor): item.label for item in train_data}
+            futures = {executor.submit(self._generate_histogram, item.descriptors): item.label for item in train_data}
             for future in as_completed(futures):
                 hist = future.result()
                 if hist is not None and hist.size > 0:

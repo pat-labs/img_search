@@ -36,21 +36,22 @@ class FisherMatrix:
         self.descriptor = self._create_descriptor()
         self.descriptor_dimension = self.descriptor.descriptorSize()
 
-    @staticmethod
-    def compute_spatial_fisher_vector(image_data: ImageDataFeature, fm, grid_size=(2, 2)):
+    def compute_spatial_fisher_vector(self, image_data: ImageDataFeature, grid_size=(2, 2)):
         """
         Computes a spatial pyramid of Fisher Vectors for an image.
         """
         h, w = image_data.shape
-        keypoints, descriptors = image_data.keypoints, image_data.descriptor
+        keypoints, descriptors = image_data.keypoints, image_data.descriptors
+
+        num_cells = grid_size[0] * grid_size[1]
+        base_fv_dim = 2 * self.k.value * self.descriptor_dimension
 
         if descriptors is None or len(descriptors) == 0:
             # Return a zero vector if no features are found
-            base_fv_dim = 2 * fm.k.value * fm.descriptor_dimension
-            return np.zeros(base_fv_dim * grid_size[0] * grid_size[1], dtype=np.float32)
+            return np.zeros(base_fv_dim * num_cells, dtype=np.float32)
 
         # Assign descriptors to grid cells
-        cell_descriptors = [[] for _ in range(grid_size[0] * grid_size[1])]
+        cell_descriptors = [[] for _ in range(num_cells)]
         cell_h, cell_w = h / grid_size[1], w / grid_size[0]
 
         for i, kp in enumerate(keypoints):
@@ -66,11 +67,10 @@ class FisherMatrix:
         for cell_desc_list in cell_descriptors:
             if cell_desc_list:
                 cell_desc_np = np.array(cell_desc_list, dtype=np.float32)
-                fv_region = fm.compute_fisher_vector(cell_desc_np)
+                fv_region = self.compute_fisher_vector(cell_desc_np)
                 final_spm_vector.append(fv_region)
             else:
                 # Append a zero vector for empty cells
-                base_fv_dim = 2 * fm.k.value * fm.descriptor_dimension
                 final_spm_vector.append(np.zeros(base_fv_dim, dtype=np.float32))
 
         return np.concatenate(final_spm_vector)
@@ -102,8 +102,8 @@ class FisherMatrix:
             raise ValueError(f"Unsupported classifier type: {self.classifier_type.name}")
 
     def train(self, train_data: List[ImageDataFeature], parallel: bool = True):
-        valid_desc = [item.descriptor for item in train_data if
-                      item.descriptor is not None and len(item.descriptor) > 0]
+        valid_desc = [item.descriptors for item in train_data if
+                      item.descriptors is not None and len(item.descriptors) > 0]
         if not valid_desc:
             raise ValueError("No valid descriptors provided for GMM training.")
 
@@ -134,7 +134,7 @@ class FisherMatrix:
     def _compute_fisher_vectors_serial(self, train_data: list[ImageDataFeature]):
         fisher_vectors, labels = [], []
         for item in train_data:
-            fv = self.compute_fisher_vector(item.descriptor)
+            fv = self.compute_fisher_vector(item.descriptors)
             if fv is not None and fv.size > 0:
                 fisher_vectors.append(fv)
                 labels.append(item.label)
@@ -143,7 +143,7 @@ class FisherMatrix:
     def _compute_fisher_vectors_parallel(self, train_data: list[ImageDataFeature]):
         fisher_vectors, labels = [], []
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(self.compute_fisher_vector, item.descriptor): item.label for item in train_data}
+            futures = {executor.submit(self.compute_fisher_vector, item.descriptors): item.label for item in train_data}
             for future in as_completed(futures):
                 fv = future.result()
                 if fv is not None and fv.size > 0:

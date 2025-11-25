@@ -26,7 +26,7 @@ class TestRandomForest(unittest.TestCase):
 
         query_image = train_data[0]
         feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-        desc = feature.descriptor
+        desc = feature.descriptors
         prediction = rf_model.predict(desc)
         self.assertEqual(prediction, query_image.label)
 
@@ -39,7 +39,7 @@ class TestRandomForest(unittest.TestCase):
 
         query_image = train_data[1]
         feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-        desc = feature.descriptor
+        desc = feature.descriptors
         prediction = rf_loaded.predict(desc)
         self.assertEqual(prediction, query_image.label)
 

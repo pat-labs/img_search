@@ -45,7 +45,7 @@ class ClusterAnalyzer:
         correct_predictions = 0
         for query_image in test_data:
             feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-            desc = feature.descriptor
+            desc = feature.descriptors
             prediction = bovw.predict(desc)
             if prediction == query_image.label:
                 correct_predictions += 1
@@ -62,7 +62,7 @@ class ClusterAnalyzer:
         predictions = "image_path,actual_label,predicted_label\n"
         for query_image in test_data:
             feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-            desc = feature.descriptor
+            desc = feature.descriptors
             prediction = bovw.predict(desc)
             predictions += f"{query_image.path},{query_image.label},{prediction}\n"
         
@@ -101,7 +101,7 @@ class ClusterAnalyzer:
 if __name__ == '__main__':
     train_dir = "/home/patrick/Documents/project/img_search/asset/dataset/train"
     test_dir = "/home/patrick/Documents/project/img_search/asset/dataset/train"
-    report_dir = "/home/patrick/Documents/project/img_search/asset/report/"
+    report_dir = "/doc/report/"
     train_data = ImageUtil.load_image_data_from_folder(train_dir)
     test_data = ImageUtil.load_image_data_from_folder(test_dir)
     bovw_report = ClusterAnalyzer.analyze_bovw(train_data, test_data, report_dir)

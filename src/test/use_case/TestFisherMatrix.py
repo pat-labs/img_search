@@ -32,7 +32,7 @@ class TestFisherMatrix(unittest.TestCase):
 
         query_image = images_data[0]
         feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-        desc = feature.descriptor
+        desc = feature.descriptors
         result = fm.predict(desc)
         self.assertEqual(result, query_image.label)
 
@@ -46,7 +46,7 @@ class TestFisherMatrix(unittest.TestCase):
 
         query_image = images_data[1]
         feature = ImageUtil.extract_features(query_image.path, descriptor_type)
-        desc = feature.descriptor
+        desc = feature.descriptors
         result = fm.predict(desc)
         self.assertEqual(result, query_image.label)
 

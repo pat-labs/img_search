@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 
 from src.main.application.use_case.AnisotropicSIFT import AnisotropicSIFT
+from src.main.application.use_case.SIFTAdHoc import SIFTAdHoc
 from src.main.domain.DescriptorType import DescriptorType
 
 
@@ -19,7 +20,7 @@ class ImageData:
 
 @dataclass
 class ImageDataFeature:
-    descriptor: np.ndarray
+    descriptors: np.ndarray
     keypoints: List[Tuple[float, float]]  # Store keypoint coordinates as tuples
     shape: Tuple[int, int]
     path: str
@@ -187,9 +188,25 @@ class ImageUtil:
 
     @staticmethod
     def calculate_average_match_distance(matches, keypoints1, keypoints2):
-        if not matches: return 0.0
-        distances = [np.linalg.norm(np.array(keypoints1[m.queryIdx].pt) - np.array(keypoints2[m.trainIdx].pt)) for m in
-                     matches]
+        """
+        Calculates the average distance between matched keypoints.
+        Assumes keypoints are provided as lists of (x, y) coordinate tuples.
+        """
+        if not matches:
+            return 0.0
+
+        distances = []
+        for m in matches:
+            if m.queryIdx < len(keypoints1) and m.trainIdx < len(keypoints2):
+                # Handle both cv2.KeyPoint objects and coordinate tuples
+                kp1 = keypoints1[m.queryIdx]
+                kp2 = keypoints2[m.trainIdx]
+                
+                pt1 = kp1.pt if isinstance(kp1, cv2.KeyPoint) else kp1
+                pt2 = kp2.pt if isinstance(kp2, cv2.KeyPoint) else kp2
+
+                distances.append(np.linalg.norm(np.array(pt1) - np.array(pt2)))
+
         return float(np.mean(distances)) if distances else 0.0
 
     @staticmethod
@@ -233,4 +250,6 @@ class ImageUtil:
             return cv2.BRISK_create()
         elif descriptor_type == DescriptorType.ANSIOTROPIC_SIFT:
             return AnisotropicSIFT()
+        elif descriptor_type == DescriptorType.SIFT_ADHOC:
+            return SIFTAdHoc()
         raise ValueError(f"Unsupported feature algorithm: {descriptor_type.name}")

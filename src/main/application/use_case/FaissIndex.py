@@ -80,8 +80,31 @@ class FaissIndex:
         distances, indices = self.index.search(query, max_items)
         results = []
         for i, d in zip(indices[0], distances[0]):
-            if self.metadata and 0 <= i < len(self.metadata):
+            # Only process and return valid indices. Ignore -1 placeholders from Faiss.
+            if i != -1 and self.metadata is not None and 0 <= i < len(self.metadata):
                 results.append((self.metadata[i], float(d)))
-            else:
-                results.append((i, float(d)))
         return results
+
+    def get_distance(self, metadata_item1: str, metadata_item2: str) -> float:
+        """
+        Calculates the distance between two items in the index, identified by their metadata.
+        """
+        if self.index is None or self.metadata is None:
+            raise RuntimeError("Index or metadata not loaded.")
+
+        try:
+            idx1 = self.metadata.index(metadata_item1)
+            idx2 = self.metadata.index(metadata_item2)
+        except ValueError as e:
+            raise ValueError(f"One of the metadata items not found in index: {e}")
+
+        # Reconstruct returns the original, un-normalized vectors.
+        vec1 = self.index.reconstruct(idx1).reshape(1, -1)
+        vec2 = self.index.reconstruct(idx2).reshape(1, -1)
+
+        # We must normalize them just like during search to get the correct distance.
+        faiss.normalize_L2(vec1)
+        faiss.normalize_L2(vec2)
+
+        # For L2, distance is the norm of the difference.
+        return float(np.linalg.norm(vec1 - vec2))

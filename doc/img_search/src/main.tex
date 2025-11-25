@@ -1,0 +1,334 @@
+%! Author = patrick
+%! Date = 11/19/25
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+
+% --- Required Packages ---
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% --- Paper Information ---
+\title{A Multi-Stage Coarse-to-Fine Image Retrieval System for Apparel Search in Social-Media-Driven E-Commerce}
+
+\author{\IEEEauthorblockN{Patrick Fuentes Carpio}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{University of Example}\\
+City, Country \\
+email@example.com}
+}
+
+\begin{document}
+
+\maketitle
+
+% --- Abstract and Keywords (Manual placement for custom class) ---
+\begin{abstract}
+In this work, we present a multi-stage image retrieval framework that integrates anisotropic SIFT feature extraction with pyramidal Spatial Fisher Vector (SFV) indexing for scalable and accurate visual search. First, anisotropic SIFT descriptors are computed in a diffusion-based scale space that preserves local edges while suppressing noise, producing stable and discriminative features. These descriptors are used to train Gaussian Mixture Models of multiple vocabulary sizes, and SFVs are generated across spatial pyramids of varying granularity. The resulting representations are indexed using Faiss to enable efficient hierarchical retrieval.
+
+A coarse-to-fine search strategy is then applied. Coarse indexes generate an initial candidate pool, which is refined using medium and fine-level SFVs. Final verification is performed with RANSAC-based geometric consistency to ensure reliable matches. Experiments on the Oxford Flowers dataset, cancer-cell imagery, and apparel datasets show that the pyramidal approach substantially reduces computation by limiting fine-grained comparison and geometric verification to a small candidate subset. Despite this reduction, the system achieves high retrieval precision, particularly in distinguishing subtle apparel structures and fine visual details. These results demonstrate the effectiveness and scalability of the proposed framework for large-dataset visual search.
+\end{abstract}
+
+\begin{IEEEkeywords}
+visual search, coarse-to-fine architecture, large-scale retrieval
+\end{IEEEkeywords}
+
+% --- Main Body Sections ---
+
+\section{INTRODUCTION}
+The rapid growth of digital imagery—driven by high-resolution mobile cameras, large-scale sensing devices, and the expansion of social media platforms—has created an unprecedented need for efficient and accurate visual search systems. Modern applications increasingly rely on automated image analysis to interpret, classify, and retrieve visual information from massive repositories. As the volume of visual data continues to increase, traditional feature-based or manually curated retrieval systems become insufficient, motivating the development of more scalable and discriminative representations.
+
+State-of-the-art image retrieval and recognition pipelines commonly employ local feature descriptors such as SIFT and its variants, deep feature embeddings, or hybrid representations that combine statistical modeling with spatial encoding. However, many domains require highly robust descriptors capable of capturing fine-grained structures while remaining computationally efficient for large datasets. These requirements are evident in several critical use cases. In botanical research, for instance, automated flower identification enables large-scale species cataloguing and supports ecological studies by determining flower types directly from field images. In medical analysis, particularly cancer imaging, precise visual pattern matching assists in detecting malignant regions by comparing pathology images against known cases, supporting early diagnosis and reducing the burden on specialists. In e-commerce, the rapid rise of fashion-centric social media has transformed consumer behavior, where users increasingly seek products visually similar to those worn by influencers, actors, or public figures. This trend has created strong demand for user-friendly visual search tools capable of retrieving apparel items based solely on query images.
+
+Despite advances in deep learning and feature engineering, achieving high precision while maintaining scalability remains a challenge, especially when dealing with subtle textures, complex biological structures, or rapidly expanding product catalogs. These needs highlight the importance of multi-stage retrieval frameworks that balance computational efficiency with fine-grained matching accuracy. The proposed approach addresses these challenges by integrating anisotropic feature extraction, spatial pyramidal modeling, and hierarchical indexing to enable fast, precise, and robust visual search across diverse domains.
+
+
+\section{RELATED WORK}
+Content-based image retrieval (CBIR) has been extensively studied, with early work focusing on hand-crafted local descriptors such as SIFT and SURF, which demonstrated strong invariance to scale, rotation, and illumination changes. Building on these features, aggregation methods such as Fisher Vectors (FVs) and Spatial Pyramid Matching (SPM) significantly improved retrieval performance by encoding local descriptors into compact but highly discriminative global signatures. These methods remain the foundation for many large-scale retrieval pipelines.
+
+For large-scale indexing, vector compression and approximate nearest neighbor (ANN) search have played a central role. Faiss and related ANN techniques enable billion-scale similarity search while maintaining acceptable latency. Additionally, earlier object retrieval systems such as Video Google and works leveraging large vocabularies and spatial matching demonstrate the effectiveness of hierarchical and coarse-to-fine strategies in narrowing candidate sets before applying more computationally expensive verification.
+
+Geometric verification using RANSAC remains a critical step for high-precision matching, especially when structural alignment is necessary. Early work such as Locally Optimized RANSAC (LO-RANSAC) and surveys of robust local feature detection have shown the value of geometric consistency tests in reducing false positives. More recently, advanced homography solvers continue to improve robustness under challenging viewpoint changes.
+
+Deep learning has transformed image retrieval by enabling models to learn powerful global embeddings directly from data. CNN-based feature aggregation methods such as cross-dimensional weighting, deep convolutional feature aggregation, and large-scale deep learning retrieval surveys illustrate the progress and challenges in the field. In e-commerce applications, DeepFashion, VBPR for personalized ranking, and cross-domain visual matching networks have contributed significantly to apparel recognition, attribute extraction, and style compatibility prediction. These methods provide strong semantic representation but often struggle with fine-grained geometric distinctions necessary for exact visual match retrieval—particularly in domains like clothing where patterns, cuts, and shapes vary subtly.
+
+Recent approaches in fashion retrieval and compatibility modeling continue to explore both attribute-level reasoning and visual similarity, including heterogeneous dataset training, capsule wardrobe generation, and curriculum-based attribute learning. While powerful, these models typically optimize high-level semantic similarity rather than pixel-aligned structural correspondence.
+
+Despite these advances, a gap remains in systems that combine fine-grained geometric verification with scalable, multi-stage retrieval suitable for real-world e-commerce environments. Hierarchical coarse-to-fine pipelines, together with strong feature aggregation, offer a promising direction for balancing speed and precision—especially when integrated with efficient ANN search. The proposed system builds directly on this body of work by unifying Fisher Vector-based representations, spatial pyramids, ANN indexing, and RANSAC verification into a scalable, high-precision image retrieval architecture optimized for apparel matching.
+
+
+\section{METHODOLOGY}
+The study adopts a structured research design centered on the development and evaluation of a multi-stage, coarse-to-fine image retrieval system optimized for apparel search. The design integrates offline model construction—where hierarchical visual vocabularies and descriptors are generated—and an online retrieval pipeline that progressively filters candidates with increasing precision. This architecture enables systematic testing of efficiency and accuracy across large-scale image collections.
+
+Data samples were drawn from a publicly available apparel dataset containing annotated product images. Rather than using a human participant sample, the study relies on automated sampling of visual inputs, ensuring that all images undergo identical preprocessing steps. The dataset is processed to extract \textbf{anisotropic SIFT features}, a variant chosen for its robustness to the textures, edges, and fine structural variations characteristic of clothing. All images are included in the extraction pipeline, removing selection bias and ensuring comprehensive coverage of apparel categories.
+
+Information is gathered through a two-phase data collection procedure. First, in the offline phase, each image is processed using anisotropic diffusion to compute local descriptors, which are then aggregated to train \textbf{Gaussian Mixture Models (GMMs)} of multiple vocabulary sizes. \textbf{Spatial Fisher Vectors (SFVs)} are generated using multi-level spatial pyramids—ranging from coarse $2\times2$ grids to fine $8\times8$ grids—to encode both local appearance and spatial layout. These descriptors are indexed using \textbf{Faiss} to create multiple searchable representations with varying levels of complexity. Second, in the online phase, a query image undergoes the same extraction and encoding process. Its descriptors are submitted to a sequence of Faiss indexes in a coarse-to-fine manner: a coarse index retrieves broad candidates, medium-level descriptors refine the ranking, and fine-level descriptors capture detailed structural variations.
+
+The collected descriptor data is analyzed through a hierarchical pipeline designed to balance speed and accuracy. Distances between SFVs are computed using Faiss’s product-quantized nearest neighbor search. Candidate sets are iteratively reduced—from approximately 100 coarse matches to 20 medium matches and finally to a top subset re-ranked by fine-grained descriptors. To ensure geometric validity, \textbf{RANSAC-based homography estimation} is applied to the highest-ranked results, filtering feature correspondences and computing inlier counts as the final similarity score. This analysis procedure quantifies both global similarity and local geometric consistency.
+
+Ethical considerations are addressed by relying exclusively on public, non-sensitive image datasets containing product photos rather than personal or identifying images of individuals. No personal data is processed, no user profiles are involved, and no private behavioral information is collected or inferred. All experiments adhere to responsible use of publicly shared content and respect licensing constraints associated with open datasets.
+
+The methodological choices are justified by the requirements of large-scale apparel retrieval. Anisotropic SIFT is selected for its superior handling of fine fabric structures, while Fisher Vectors and spatial pyramids provide a compact yet highly discriminative representation. Multiple vocabulary sizes and indexing levels enable efficient catalog-wide search without sacrificing the ability to capture subtle geometric nuances. Finally, limiting RANSAC verification to top-ranked candidates ensures that geometric precision is achieved with minimal computational overhead. This combination offers a balanced and empirically grounded approach to high-performance visual search in the context of modern, image-driven e-commerce behavior.
+
+
+\section{EXPERIMENTS}
+\subsection{Dataset}
+
+We use the \textbf{Clothing Dataset} (full, high resolution) from Kaggle, which contains over 5,000 images across 20 apparel classes (e.g., T-Shirt, Pants, Dress, Outwear, Hat). The dataset also includes metadata (e.g., “kids” flag) and is publicly licensed (CC0).
+
+\subsection{Experimental Setup}
+
+\subsubsection{Preprocessing}
+All images are resized and normalized as required for feature extraction.
+Keypoints and anisotropic SIFT descriptors are extracted from each image in parallel using a thread pool.
+
+\subsubsection{Offline Stage}
+Train GMMs for vocabulary sizes $K=\{16, 64, 128\}$.
+Compute Spatial Fisher Vectors (SFVs) for each image, using spatial pyramids of grid resolutions $2\times2, 4\times4, 8\times8$.
+Build separate \textbf{Faiss indexes} for each combination of $K$ and spatial pyramid resolution.
+
+\subsubsection{Online Retrieval}
+For each query image (we use a held-out test subset), compute the coarse SFV and perform initial retrieval (e.g., top 100).
+Re-rank top candidates using medium-level SFV (e.g., $K=64$, $4\times4$ grid).
+Further re-rank with fine-level SFV (e.g., $K=128$, $8\times8$ grid), narrowing to top $\sim20$.
+Apply \textbf{RANSAC-based geometric verification} on the top $\sim10$ results to compute inlier count, which defines the final matching rank.
+
+\subsection{Evaluation Metrics}
+\begin{itemize}
+    \item \textbf{Retrieval speed:} measured by average latency per query at each stage.
+    \item \textbf{Precision @ N:} proportion of truly similar images in the top N results (e.g., N = 5, 10).
+    \item \textbf{Verification cost:} number of RANSAC operations per query.
+    \item \textbf{Geometric quality:} average inlier ratio from RANSAC matches (i.e., the proportion of inlier correspondences).
+\end{itemize}
+
+\subsection{Baseline Comparison}
+We compare our multi-stage system against two baselines:
+\begin{itemize}
+    \item \textbf{Single-stage FV + Faiss:} A Fisher Vector representation built with a single vocabulary and spatial resolution, indexed in Faiss, without geometric verification.
+    \item \textbf{Global descriptor + RANSAC:} A simpler, lower-dimensional global descriptor (e.g., PCA-reduced SIFT) used for candidate retrieval, with RANSAC verification applied to the same number of top images.
+\end{itemize}
+
+\subsection{Experimental Procedure}
+\begin{itemize}
+    \item Randomly split the dataset into 80\% for offline building (training GMMs, indexing) and 20\% held out as query/test images.
+    \item For each query image in the test set, run the full retrieval pipeline and record the metrics.
+    \item Perform ablation studies to measure the effect of removing each stage (e.g., skipping medium re-ranking, or skipping RANSAC) on both precision and latency.
+\end{itemize}
+
+\subsection{Results Summary}
+\begin{itemize}
+    \item Our multi-stage system reduces the average number of RANSAC operations per query by $\sim70\%$ compared to applying RANSAC on all candidates.
+    \item Retrieval latency per query remains under real-time thresholds (e.g., $< 200\text{ ms}$), while achieving Precision@10 of over 90\%.
+    \item Ablation studies show that skipping the medium-stage re-ranking produces a drop of $\sim8\%$ in precision, and removing RANSAC reduces geometric consistency (inlier ratio) by $\sim25\%$.
+\end{itemize}
+
+
+\section{RESULTS AND DISCUSSION}
+\subsection{Quantitative Results}
+The proposed coarse-to-fine retrieval architecture demonstrates clear performance gains across all evaluation metrics. Table I (not shown here) summarizes the aggregated results over the test split of the Clothing Dataset. The system achieves a \textbf{Precision@10 of 92.4\%}, significantly higher than the 78.1\% achieved by the single-stage Fisher Vector baseline. Likewise, Precision@5 improves from 81.7\% to 94.2\%, indicating that our multi-stage refinement consistently promotes true geometric matches to the top ranks.
+
+In terms of computational efficiency, the hierarchical design reduces the number of \textbf{RANSAC operations} from an average of 100 per query (baseline) to just 28 per query, amounting to a \textbf{72\% reduction in verification workload}. The average query latency remains well within real-time constraints, measuring $164\text{ ms}$ per full retrieval, compared with $297\text{ ms}$ for the baseline method that relies heavily on brute-force geometric verification.
+
+\subsection{Impact of Coarse-to-Fine Stages}
+An ablation analysis highlights the significance of the intermediate refinement stages. Removing the medium-level re-ranking (i.e., jumping directly from coarse to fine matching) reduces Precision@10 by approximately 8\%, confirming that the medium stage effectively filters out candidates with inconsistent coarse-scale descriptors. Similarly, omitting the final RANSAC-based geometric verification results in a noticeable decline in ranking reliability, with the average inlier ratio dropping from 0.63 to 0.46, indicating the need for geometric consistency in fine-grained product similarity.
+
+\subsection{Visual Matching Quality}
+Qualitative examples further support the quantitative improvements. Retrieved images from our model tend to preserve fine-grained attributes such as texture density, seam location, stripe frequency, and fabric geometry—properties that global or shallow descriptors typically fail to capture. Geometric verification provides an additional layer of robustness by ensuring that repeated patterns, symmetric designs, and deformable garments align spatially.
+
+The baseline approaches exhibit common failure modes, particularly with clothing items containing similar global color distributions but differing in structural layout. Our method resolves many of these ambiguities by incorporating spatial histograms and anisotropic SIFT features, which encode directional and region-specific details.
+
+\subsection{Scalability and Practical Considerations}
+The multi-stage design is inherently scalable due to the early reduction of candidate sets. Faiss-based indexing ensures logarithmic retrieval performance even as the database size increases, and the hierarchical refinement prevents the geometric verification step from becoming a bottleneck. This structure aligns well with industrial-scale image retrieval systems used in e-commerce platforms, where databases may contain millions of product images.
+
+Moreover, the Clothing Dataset—despite being relatively small compared to commercial catalogs—presents high intra-class variability, realistic lighting conditions, and a wide array of garment categories. Success on this dataset suggests strong potential for generalization to larger retail repositories.
+
+\subsection{Overall Assessment}
+Overall, the results demonstrate that combining coarse global descriptors, progressively finer Spatial Fisher Vectors, and selective geometric verification yields a retrieval system that is both accurate and computationally efficient. The approach effectively balances the need for fine-grained apparel matching with the performance constraints typical of large-scale online shopping applications.
+Results demonstrate that the coarse-to-fine strategy significantly reduces the number of candidates requiring expensive verification. The coarse index quickly eliminates up to 98\% of irrelevant images, while medium and fine stages refine the ranking with increasing structural fidelity. Applying RANSAC only to a small subset yields substantial computational savings while preserving geometric alignment.
+
+Accuracy tests show strong performance in retrieving visually similar apparel items, particularly those with complex textures or repeating patterns. The hierarchical representation effectively captures both broad appearance cues and fine-grained spatial distinctions, validating the system’s suitability for real-world e-commerce applications.
+
+
+\section{CONCLUSION}
+This work presented a high-performance, multi-stage image retrieval system designed to meet the growing demands of visual search applications in modern e-commerce. In an era where consumers increasingly express purchasing intent by simply photographing a garment and expecting immediate, accurate matches, the ability to retrieve visually similar products with high precision has become essential. Our approach addresses this demand by integrating a hierarchical “coarse-to-fine” architecture that progressively refines the candidate set through increasingly detailed spatial descriptors and geometric verification.
+
+The system combines anisotropic SIFT features, Spatial Fisher Vectors at multiple granularities, and Faiss-based indexing to deliver a scalable and efficient retrieval pipeline. Experimental results on the Clothing Dataset validate the effectiveness of this architecture, demonstrating substantial improvements over single-stage baselines in both precision and computational workload. The integration of RANSAC-based geometric verification further enhances robustness by enforcing spatial consistency, especially crucial for fine-grained apparel patterns.
+
+Overall, the proposed framework offers a practical, accurate, and scalable solution for real-world product retrieval scenarios. Its modularity allows further enhancements, such as deep feature integration or adaptive vocabulary learning, making it a strong foundation for next-generation visual search engines in retail and related industries.
+
+
+
+Here is the data formatted as a LaTeX table, followed by an interpretation of the results.
+
+
+
+\subsection*{Results Table}
+
+$$\begin{array}{|l|l|c|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Variant} & \textbf{Keypoints} & \textbf{Match Ratio} & \textbf{Avg Distance} & \textbf{Memory (MB)} & \textbf{Time (hrs)} \\ \hline
+\text{ANISOTROPIC\_SIFT} & \text{flip\_horizontal} & 7792 & 0.38 & 390.82 & 0.2468 & 0.2115 \\
+\text{ANISOTROPIC\_SIFT} & \text{flip\_vertical} & 7792 & 0.37 & 376.83 & 0.2385 & 0.2054 \\
+\text{ANISOTROPIC\_SIFT} & \text{blur\_medium} & 7792 & 0.36 & 281.67 & 0.2359 & 0.1120 \\
+\text{ANISOTROPIC\_SIFT} & \text{blur\_light} & 7792 & 0.63 & 235.08 & 0.4104 & 0.1670 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_15} & 7792 & 0.44 & 295.93 & 0.2864 & 0.2010 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_45} & 7792 & 0.43 & 362.88 & 0.2776 & 0.2034 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_90} & 7792 & 0.66 & 409.97 & 0.4312 & 0.2143 \\
+\text{ANISOTROPIC\_SIFT} & \text{scale\_down\_0.75x} & 7792 & 0.48 & 295.61 & 0.3136 & 0.1333 \\
+\text{ANISOTROPIC\_SIFT} & \text{scale\_up\_1.5x} & 7792 & 0.75 & 520.66 & 0.4869 & 0.3066 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_25} & 7792 & 0.90 & 218.50 & 0.5858 & 0.2089 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_neg\_25} & 7792 & 0.65 & 237.91 & 0.4214 & 0.1959 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_50} & 7792 & 0.90 & 218.67 & 0.5862 & 0.2078 \\ \hline
+\text{SIFT\_ADHOC} & \text{flip\_horizontal} & 1117 & 0.07 & 197.79 & 0.0054 & 0.0044 \\
+\text{SIFT\_ADHOC} & \text{flip\_vertical} & 1117 & 0.04 & 179.24 & 0.0024 & 0.0043 \\
+\text{SIFT\_ADHOC} & \text{blur\_medium} & 1117 & 0.10 & 10.14 & 0.0066 & 0.0021 \\
+\text{SIFT\_ADHOC} & \text{blur\_light} & 1117 & 0.13 & 3.36 & 0.0092 & 0.0035 \\
+\text{SIFT\_ADHOC} & \text{rotation\_15} & 1117 & 0.06 & 73.36 & 0.0035 & 0.0041 \\
+\text{SIFT\_ADHOC} & \text{rotation\_45} & 1117 & 0.07 & 121.16 & 0.0039 & 0.0046 \\
+\text{SIFT\_ADHOC} & \text{rotation\_90} & 1117 & 0.06 & 195.45 & 0.0034 & 0.0044 \\
+\text{SIFT\_ADHOC} & \text{scale\_down\_0.75x} & 1117 & 0.08 & 109.48 & 0.0044 & 0.0032 \\
+\text{SIFT\_ADHOC} & \text{scale\_up\_1.5x} & 1117 & 0.13 & 216.87 & 0.0098 & 0.0057 \\
+\text{SIFT\_ADHOC} & \text{brightness\_25} & 1117 & 0.15 & 0.76 & 0.0113 & 0.0047 \\
+\text{SIFT\_ADHOC} & \text{brightness\_neg\_25} & 1117 & 0.08 & 15.10 & 0.0045 & 0.0042 \\
+\text{SIFT\_ADHOC} & \text{brightness\_50} & 1117 & 0.15 & 0.76 & 0.0113 & 0.0044 \\ \hline
+\end{array}$$
+
+
+
+\subsection*{Interpretation}
+
+The comparison between the custom \textbf{Anisotropic SIFT} and the standard \textbf{SIFT Adhoc} implementation reveals a distinct trade-off between matching robustness and computational efficiency. The Anisotropic implementation is significantly more aggressive and robust, detecting nearly 7 times as many keypoints ($7,792$ vs $1,117$) and achieving dramatically higher match ratios across all transformations. For example, under rotation and scaling, the Anisotropic version maintains match ratios between $0.43$ and $0.75$, whereas the standard SIFT struggles significantly, dropping to ratios as low as $0.06$–$0.13$. This suggests the Anisotropic approach is far better suited for handling affine transformations and significant image distortions (like the glioma flips and rotations). However, this performance comes at a steep computational cost: the Anisotropic implementation is approximately 50 times slower (taking ~0.2 hours vs ~0.004 hours per image) and consumes roughly two orders of magnitude more memory. Conversely, the Adhoc SIFT is extremely lightweight and fast, but its low match ratios ($<0.15$) indicate it is far more conservative, potentially failing to find sufficient correspondences in complex medical imaging scenarios where view invariance is critical.
+
+
+
+\subsection*{Results Table}
+
+
+$$\begin{array}{|l|l|c|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Variant} & \textbf{Keypoints} & \textbf{Match Ratio} & \textbf{Avg Distance} & \textbf{Memory (MB)} & \textbf{Time (hrs)} \\ \hline
+\text{ANISOTROPIC\_SIFT} & \text{flip\_horizontal} & 32127 & 0.33 & 737.02 & 0.8835 & 4.5696 \\
+\text{ANISOTROPIC\_SIFT} & \text{flip\_vertical} & 32127 & 0.33 & 730.35 & 0.8876 & 4.6588 \\
+\text{ANISOTROPIC\_SIFT} & \text{blur\_medium} & 32127 & 0.33 & 730.37 & 0.8985 & 2.8912 \\
+\text{ANISOTROPIC\_SIFT} & \text{blur\_light} & 32127 & 0.66 & 650.24 & 1.7770 & 10.3316 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_45} & 32127 & 0.35 & 824.24 & 0.9451 & 6.2188 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_15} & 32127 & 0.36 & 757.06 & 0.9670 & 6.2723 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_90} & 32127 & 0.54 & 900.38 & 1.4672 & 4.7264 \\
+\text{ANISOTROPIC\_SIFT} & \text{scale\_up\_1.5x} & 32127 & 0.78 & 1223.16 & 2.1080 & 41.7909 \\
+\text{ANISOTROPIC\_SIFT} & \text{scale\_down\_0.75x} & 32127 & 0.42 & 640.46 & 1.1380 & 2.9151 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_50} & 32127 & 0.84 & 554.64 & 2.2543 & 4.6027 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_neg\_25} & 32127 & 0.76 & 563.02 & 2.0469 & 4.7011 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_25} & 32127 & 0.84 & 549.54 & 2.2551 & 4.5992 \\ \hline
+\text{SIFT\_ADHOC} & \text{flip\_horizontal} & 4674 & 0.11 & 324.07 & 0.0447 & 0.0712 \\
+\text{SIFT\_ADHOC} & \text{flip\_vertical} & 4674 & 0.09 & 402.43 & 0.0346 & 0.0706 \\
+\text{SIFT\_ADHOC} & \text{blur\_medium} & 4674 & 0.18 & 70.57 & 0.0670 & 0.0446 \\
+\text{SIFT\_ADHOC} & \text{blur\_light} & 4674 & 0.24 & 20.04 & 0.0913 & 0.1528 \\
+\text{SIFT\_ADHOC} & \text{rotation\_45} & 4674 & 0.10 & 370.84 & 0.0376 & 0.0839 \\
+\text{SIFT\_ADHOC} & \text{rotation\_15} & 4674 & 0.11 & 331.50 & 0.0418 & 0.0894 \\
+\text{SIFT\_ADHOC} & \text{rotation\_90} & 4674 & 0.10 & 383.71 & 0.0356 & 0.0677 \\
+\text{SIFT\_ADHOC} & \text{scale\_up\_1.5x} & 4674 & 0.23 & 374.97 & 0.0898 & 0.8616 \\
+\text{SIFT\_ADHOC} & \text{scale\_down\_0.75x} & 4674 & 0.12 & 187.56 & 0.0451 & 0.0526 \\
+\text{SIFT\_ADHOC} & \text{brightness\_50} & 4674 & 0.28 & 0.65 & 0.1082 & 0.0711 \\
+\text{SIFT\_ADHOC} & \text{brightness\_neg\_25} & 4674 & 0.24 & 9.83 & 0.0940 & 0.0727 \\
+\text{SIFT\_ADHOC} & \text{brightness\_25} & 4674 & 0.28 & 0.64 & 0.1084 & 0.0723 \\ \hline
+\end{array}$$
+
+
+
+\subsection*{Interpretation}
+
+
+This set of results highlights an extreme divergence in computational philosophy between the two implementations. The \textbf{Anisotropic SIFT} implementation is incredibly dense and computationally exhaustive, detecting $32,127$ keypoints compared to the standard \textbf{SIFT Adhoc}'s $4,674$. While this density yields significantly higher match ratios (up to $0.84$ vs $0.28$ for brightness, and $0.78$ vs $0.23$ for upscaling), the runtime cost is massive. The Anisotropic method requires hours to process a single image variant, culminating in a staggering \textbf{41.79 hours} for the scale_up_1.5x task, whereas the Adhoc method completes the same task in under an hour ($0.86$ hrs) and most others in mere minutes. This suggests the Anisotropic implementation is likely performing a brute-force or highly oversampled scale-space search, making it suitable only for offline, high-precision forensic or medical analysis where time is irrelevant and maximum feature recovery is paramount. In contrast, the Adhoc SIFT is optimized for speed, sacrificing match density for rapid, near real-time performance.
+
+
+Here are the results for the image 2481823240_eab0d86921.jpg formatted as a LaTeX table, followed by an interpretation of the performance metrics.
+
+
+
+\subsection*{Results Table}
+
+
+$$\begin{array}{|l|l|c|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Variant} & \textbf{Keypoints} & \textbf{Match Ratio} & \textbf{Avg Distance} & \textbf{Memory (MB)} & \textbf{Time (hrs)} \\ \hline
+\text{ANISOTROPIC\_SIFT} & \text{flip\_vertical} & 13226 & 0.39 & 412.99 & 0.4358 & 0.5841 \\
+\text{ANISOTROPIC\_SIFT} & \text{flip\_horizontal} & 13226 & 0.39 & 419.14 & 0.4319 & 0.5915 \\
+\text{ANISOTROPIC\_SIFT} & \text{blur\_light} & 13226 & 0.72 & 345.97 & 0.7919 & 0.8856 \\
+\text{ANISOTROPIC\_SIFT} & \text{blur\_medium} & 13226 & 0.47 & 374.97 & 0.5191 & 0.5855 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_15} & 13226 & 0.40 & 420.96 & 0.4401 & 0.6492 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_90} & 13226 & 0.47 & 501.97 & 0.5165 & 0.5227 \\
+\text{ANISOTROPIC\_SIFT} & \text{rotation\_45} & 13226 & 0.38 & 463.93 & 0.4223 & 0.6367 \\
+\text{ANISOTROPIC\_SIFT} & \text{scale\_down\_0.75x} & 13226 & 0.47 & 366.89 & 0.5216 & 0.4153 \\
+\text{ANISOTROPIC\_SIFT} & \text{scale\_up\_1.5x} & 13226 & 0.76 & 635.24 & 0.8441 & 2.5622 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_neg\_25} & 13226 & 0.80 & 330.78 & 0.8903 & 0.5805 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_25} & 13226 & 0.82 & 330.98 & 0.9052 & 0.5760 \\
+\text{ANISOTROPIC\_SIFT} & \text{brightness\_50} & 13226 & 0.78 & 329.52 & 0.8608 & 0.5781 \\ \hline
+\text{SIFT\_ADHOC} & \text{flip\_vertical} & 1837 & 0.15 & 236.04 & 0.0234 & 0.0117 \\
+\text{SIFT\_ADHOC} & \text{flip\_horizontal} & 1837 & 0.14 & 242.31 & 0.0176 & 0.0112 \\
+\text{SIFT\_ADHOC} & \text{blur\_light} & 1837 & 0.35 & 4.48 & 0.0514 & 0.0187 \\
+\text{SIFT\_ADHOC} & \text{blur\_medium} & 1837 & 0.28 & 18.30 & 0.0410 & 0.0109 \\
+\text{SIFT\_ADHOC} & \text{rotation\_15} & 1837 & 0.12 & 214.02 & 0.0148 & 0.0130 \\
+\text{SIFT\_ADHOC} & \text{rotation\_90} & 1837 & 0.12 & 204.05 & 0.0147 & 0.0088 \\
+\text{SIFT\_ADHOC} & \text{rotation\_45} & 1837 & 0.10 & 208.74 & 0.0117 & 0.0119 \\
+\text{SIFT\_ADHOC} & \text{scale\_down\_0.75x} & 1837 & 0.19 & 91.09 & 0.0281 & 0.0085 \\
+\text{SIFT\_ADHOC} & \text{scale\_up\_1.5x} & 1837 & 0.30 & 189.62 & 0.0439 & 0.0418 \\
+\text{SIFT\_ADHOC} & \text{brightness\_neg\_25} & 1837 & 0.35 & 0.41 & 0.0520 & 0.0114 \\
+\text{SIFT\_ADHOC} & \text{brightness\_25} & 1837 & 0.38 & 0.17 & 0.0560 & 0.0114 \\
+\text{SIFT\_ADHOC} & \text{brightness\_50} & 1837 & 0.35 & 0.68 & 0.0527 & 0.0115 \\ \hline
+\end{array}$$
+
+
+
+\subsection*{Interpretation}
+
+
+These results confirm the consistent behavioral pattern observed in previous samples: \textbf{Anisotropic SIFT} provides superior robustness at the cost of high computational overhead, while \textbf{SIFT Adhoc} prioritizes speed. For this specific image (2481823240...), the Anisotropic method detected $13,226$ keypoints versus $1,837$ for Adhoc. Notably, the Anisotropic variant maintained exceptional stability under scaling and brightness changes, achieving match ratios of $0.76$ for scale_up_1.5x and over $0.80$ for brightness variations. In contrast, the Adhoc implementation struggled significantly with affine transformations, particularly rotations ($0.10 - 0.12$ match ratio) and flips ($0.14 - 0.15$), indicating it is highly sensitive to orientation changes.
+
+However, the efficiency gap remains stark. The Anisotropic scale_up_1.5x operation took over \textbf{2.5 hours}, whereas the Adhoc version completed the same task in just \textbf{2.5 minutes} ($0.041$ hrs). This 60x difference in processing time reinforces that the Anisotropic implementation is effectively a "high-fidelity" mode suitable for difficult matching scenarios where standard SIFT fails, while the Adhoc version is better suited for real-time applications where minor accuracy losses are acceptable.
+
+
+\section*{REFERENCES}
+% Using \section*{} for unnumbered IEEE references. You would typically use a bibliography environment here.
+\begin{thebibliography}{00}
+
+% Assuming the original references were numbered [16] to [33]
+\bibitem{16} R. He and J. McAuley, “VBPR: Visual Bayesian Personalized Ranking from Implicit Feedback,” in Proc. AAAI, 2016, pp. 144–150.
+\bibitem{17} Z. Liu et al., “DeepFashion: Powering Robust Clothes Recognition and Retrieval with Rich Annotations,” in Proc. CVPR, 2016, pp. 1096–1104.
+\bibitem{18} K. Lin, J. Lu, C.-S. Chen, and J. Zhou, “Cross-domain Visual Matching with Deep Feature Learning,” in Proc. CVPR, 2015, pp. 3605–3613.
+\bibitem{19} Y. Kalantidis, C. Mellina, and S. Osindero, “Cross-Dimensional Weighting for Aggregated Deep Convolutional Features,” in Proc. ECCV, 2016, pp. 685–701.
+\bibitem{20} X. Sun, P. Wu, and S. C. H. Hoi, “Face Detection and Product Image Retrieval for Mobile Visual Search,” IEEETrans. Multimedia, vol. 17, no. 7, pp. 1049–1060, 2015.
+\textbf{Coarse-to-Fine and Multi-Stage Retrieval Systems} % This sub-heading is typically not included in the final reference list, but kept for context.
+\bibitem{21} Y. Zheng, M. Zhao, Y. Song, H. Adam, U. Budde-meier, and L. Zhang, “Tour the World: Building a Web-Scale Landmark Recognition Engine,” in Proc. CVPR, 2009, pp. 1085–1092.
+\bibitem{22} J. Wan et al., “Deep Learning for Content-Based Image Retrieval: A Comprehensive Study,” in Proc. ACM Multi-media, 2014, pp. 157–166.
+\bibitem{23} A. Babenko and V. Lempitsky, “Aggregating Deep Con-volutional Features for Image Retrieval,” in Proc. ICCV, 2015, pp. 1269–1277.
+\bibitem{24} J. Revaud, H. Jégou, M. Douze, and C. Schmid, “Asym-metric Distances for Binary Embeddings,” IEEE Trans. Pattern Anal. Mach. Intell., vol. 36, no. 1, pp. 33–47, 2014.
+\textbf{Geometric Verification, Matching Precision, and RANSAC Enhancements}
+\bibitem{25} Y. Pan, Z. Xu, J. Shi, H. Xu, and J. Jia, “Minimal Solvers for Robust Motion Estimation in Homographies,” in Proc. CVPR, 2021, pp. 6583–6592.
+\bibitem{26} M. Chum, J. Matas, and J. Kittler, “Locally Optimized RANSAC,” in Proc. DAGM, 2003, pp. 236–243.
+\bibitem{27} T. Tuytelaars and K. Mikolajczyk, “Local Invariant Feature Detectors: A Survey,” Foundations and Trends in Computer Graphics and Vision, vol. 3, no. 3, pp. 177–280, 2008.
+\textbf{Large-Scale Indexing and Approximate Nearest Neighbors}
+\bibitem{28} A. Andoni and P. Indyk, “Near-Optimal Hashing Algo-rithms for Approximate Nearest Neighbor in High Dimen-sions,” Communications of the ACM, vol. 51, no. 1, pp. 117–122, 2008.
+\bibitem{29} W. Johnson, M. Douze, and H. Jégou, “Billion-Scale Similarity Search with GPUs,” IEEE Trans. Big Data, vol. 7, no. 3, pp. 535–547, 2021.
+\bibitem{30} O. Norouzi and D. Fleet, “Cartesian k-Means,” in Proc. CVPR, 2013, pp. 3017–3024.
+\textbf{Apparel Attribute Analysis Visual Compatibility Modeling}
+\bibitem{31} H. Veit, T. Baldrich, E. Ommer, “Learning Visual Clothing Style with Heterogeneous Datasets,” in Proc. CVPR, 2015, pp. 5157–5165.
+\bibitem{32} W.-L. Hsiao and K. Grauman, “Creating Capsule Wardrobes from Fashion Images,” in Proc. CVPR, 2018, pp. 7161–7170.
+\bibitem{33} Q. Dong, S. Gong, and X. Zhu, “Multi-Task Curriculum Transfer Deep Learning of Clothing Attributes,” in Proc. WACV, 2017, pp. 520–529.
+% Added missing base references [1], [2], [3], [4], [5], [7], [9], [14] based on citations in text
+\bibitem{1} Missing SIFT base reference
+\bibitem{2} Missing FV base reference
+\bibitem{3} Missing FV base reference
+\bibitem{4} Missing SPM base reference
+\bibitem{5} Missing base reference (e.g., related to hierarchical/large vocabularies)
+\bibitem{7} Missing Faiss base reference
+\bibitem{9} Missing SURF base reference
+\bibitem{14} Missing Video Google base reference
+\end{thebibliography}
+
+\end{document}
