@@ -28,10 +28,10 @@ class ImageDataFeature:
 
 
 # --- Top-level worker function for multiprocessing ---
-def _process_image_worker(args: Tuple[str, str, DescriptorType]) -> Optional[ImageDataFeature]:
-    image_path, label, descriptor_type = args
+def _process_image_worker(args: Tuple[str, str, DescriptorType, bool]) -> Optional[ImageDataFeature]:
+    image_path, label, descriptor_type, use_gpu = args
     try:
-        descriptor = ImageUtil.create_descriptor(descriptor_type)
+        descriptor = ImageUtil.create_descriptor(descriptor_type, use_gpu=use_gpu)
         if descriptor is None: return None
         img = ImageUtil.load_grayscale_image(image_path)
         h, w = img.shape
@@ -210,34 +210,83 @@ class ImageUtil:
         return float(np.mean(distances)) if distances else 0.0
 
     @staticmethod
-    def extract_features(image_path: str, algorithm: DescriptorType, label: str = "Unknown"):
-        descriptor = ImageUtil.create_descriptor(algorithm)
+    def save_features(directory_path: str, base_filename: str, features: ImageDataFeature):
+        """
+        Saves keypoints and descriptors to separate .npy files.
+        """
+        os.makedirs(directory_path, exist_ok=True)
+
+        keypoints_path = os.path.join(directory_path, f"{base_filename}_keypoints.npy")
+        descriptors_path = os.path.join(directory_path, f"{base_filename}_descriptors.npy")
+        meta_path = os.path.join(directory_path, f"{base_filename}_meta.npy")
+
+        np.save(keypoints_path, np.array(features.keypoints))
+        np.save(descriptors_path, features.descriptors)
+        np.save(meta_path, np.array(features.shape))
+        print(f"💾 Features saved to {directory_path}")
+
+    @staticmethod
+    def load_features(keypoints_path: str, descriptors_path: str, original_path: str, label: str) -> Optional[ImageDataFeature]:
+        """
+        Loads keypoints and descriptors from .npy files into an ImageDataFeature object.
+        """
+        meta_path = keypoints_path.replace("_keypoints.npy", "_meta.npy")
+        if not all(os.path.exists(p) for p in [keypoints_path, descriptors_path, meta_path]):
+            print(f"⚠️ Feature files not found.")
+            return None
+
+        try:
+            # Load the coordinate tuples from the file
+            keypoint_coords = np.load(keypoints_path, allow_pickle=True).tolist()
+            # Reconstruct cv2.KeyPoint objects for use in other functions
+            keypoints = [cv2.KeyPoint(x=pt[0], y=pt[1], size=10) for pt in keypoint_coords]
+            descriptors = np.load(descriptors_path, allow_pickle=True)
+            shape = tuple(np.load(meta_path, allow_pickle=True))
+            return ImageDataFeature(descriptors, keypoints, shape, original_path, label)
+        except Exception as e:
+            print(f"❌ Failed to load features: {e}")
+            return None
+
+    @staticmethod
+    def extract_features(image_path: str, algorithm: DescriptorType, label: str = "Unknown", use_gpu: bool = False):
+        descriptor = ImageUtil.create_descriptor(algorithm, use_gpu=use_gpu)
         if descriptor is None: return [], None
         img = ImageUtil.load_grayscale_image(image_path)
         h, w = img.shape
         keys, desc = descriptor.detectAndCompute(img, None)
         if desc is not None and len(desc) > 0:
-            return ImageDataFeature(desc.astype(np.float32), keys, (h, w), image_path, label)
+            # Always convert KeyPoint objects to a serializable format (tuples of coordinates)
+            keypoint_coords = [kp.pt for kp in keys]
+            return ImageDataFeature(desc.astype(np.float32), keypoint_coords, (h, w), image_path, label)
         else:
             print(f"⚠️ No descriptors for {image_path}")
-            return [], None
+            return None
 
     @staticmethod
-    def extract_descriptors_parallel(path_labels: List[ImageData], algorithm: DescriptorType):
-        worker_args = [(item.path, item.label, algorithm) for item in path_labels]
+    def extract_descriptors_parallel(path_labels: List[ImageData], algorithm: DescriptorType, use_gpu: bool = False):
+        worker_args = [(item.path, item.label, algorithm, use_gpu) for item in path_labels]
         with multiprocessing.Pool() as pool:
             results = pool.map(_process_image_worker, worker_args)
         return [r for r in results if r is not None]
 
     @staticmethod
-    def extract_descriptors_serial(path_labels: List[ImageData], algorithm: DescriptorType):
+    def extract_descriptors_serial(path_labels: List[ImageData], algorithm: DescriptorType, use_gpu: bool = False):
         results = []
         for item in path_labels:
-            results.append(ImageUtil.extract_features(item.path, algorithm))
+            results.append(ImageUtil.extract_features(item.path, algorithm, use_gpu=use_gpu))
         return results
 
     @staticmethod
-    def create_descriptor(descriptor_type):
+    def create_descriptor(descriptor_type, use_gpu: bool = False):
+        if use_gpu and cv2.cuda.getCudaEnabledDeviceCount() > 0:
+            print("✅ GPU detected. Attempting to use CUDA-accelerated descriptors.")
+            try:
+               if descriptor_type == DescriptorType.SIFT_ADHOC:
+                    return cv2.cuda.SIFTAdHoc()
+            except AttributeError:
+                print(f"⚠️ CUDA version for {descriptor_type.name} not available. Falling back to CPU.")
+
+        # CPU Fallback
         if descriptor_type == DescriptorType.SIFT:
             return cv2.SIFT_create(DESIRED_KEYPOINTS)
         elif descriptor_type == DescriptorType.ORB:

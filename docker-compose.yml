@@ -1,9 +1,9 @@
 services:
   app:
-    container_name: ${APP_HOST:-img_search}
+    container_name: ${APP_HOST:-latex}
     build: .
     volumes:
-      - ./src_old/:/home/app/src_old/
+      - ./as_is/:/home/app/as_is/
     networks:
       - public
       

@@ -16,7 +16,7 @@ class ImageSearch:
 
     def __init__(self):
         #self.dataset_dir = DatasetMock.animals_mock()
-        #self.dataset_dir = "/home/patrick/Documents/project/img_search/asset/dataset/flowers/sanitize"
+        #self.dataset_dir = "/home/patrick/Documents/project/latex/asset/dataset/flowers/sanitize"
         self.dataset_dir = "/home/patrick/Documents/project/img_search/asset/dataset/flowers/"
 
     def _rerank_with_ransac(self, query_features: ImageDataFeature, candidate_features: list[ImageDataFeature],
@@ -60,7 +60,7 @@ class ImageSearch:
         descriptor_type = DescriptorType.ANSIOTROPIC_SIFT
         classifier_type = ClassifierType.SVM
         #images_data = ImageUtil.load_image_data_from_folder(self.dataset_dir)
-        images_data = ImageUtil.load_image_data_from_csv(self.dataset_dir + "train.csv")
+        images_data = ImageUtil.load_image_data_from_csv(self.dataset_dir + "images.csv")
         base_path = self.dataset_dir + "train/"
         for item in images_data:
             item.path = base_path + item.path

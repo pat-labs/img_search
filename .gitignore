@@ -22,4 +22,4 @@ venv/
 .vscode/
 *.swp
 *.swo
-/src_old/
+/as_is/

@@ -11,9 +11,9 @@ ransacThreshold = 5
 
 def main():
     # Load Boxes, Rainier1 and Rainier2 images
-    # boxes = cv.imread("C://Users//pa-tr//Documents//projects//img_search//stich//project_images//Boxes.png")
-    # rainier1 = cv.imread("C://Users//pa-tr//Documents//projects//img_search//stich//project_images//Rainier1.png")
-    # rainier2 = cv.imread("C://Users//pa-tr//Documents//projects//img_search//stich//project_images//Rainier2.png")
+    # boxes = cv.imread("C://Users//pa-tr//Documents//projects//latex//stich//project_images//Boxes.png")
+    # rainier1 = cv.imread("C://Users//pa-tr//Documents//projects//latex//stich//project_images//Rainier1.png")
+    # rainier2 = cv.imread("C://Users//pa-tr//Documents//projects//latex//stich//project_images//Rainier2.png")
 
     # Create output folder
     create_directory("assets/output")
@@ -31,9 +31,9 @@ def main():
     # rainier2_corners = HarrisCornerDetection.find_interest_points(rainier2, harris_threshold,
     #                                                               saveCornerImage=True,
     #                                                               savedImagePath="project_images/output/1c.png")
-    # cv.imshow("1a. Boxes Harris Corner Detection (src_old/project_images/output/1a.png)", boxes_corners)
-    # cv.imshow("1b. Rainier1 Harris Corner Detection (src_old/project_images/output/1b.png)", rainier1_corners)
-    # cv.imshow("1c. Rainier2 Harris Corner Detection (src_old/project_images/output/1c.png)", rainier2_corners)
+    # cv.imshow("1a. Boxes Harris Corner Detection (as_is/project_images/output/1a.png)", boxes_corners)
+    # cv.imshow("1b. Rainier1 Harris Corner Detection (as_is/project_images/output/1b.png)", rainier1_corners)
+    # cv.imshow("1c. Rainier2 Harris Corner Detection (as_is/project_images/output/1c.png)", rainier2_corners)
     # cv.waitKey(0)
     # cv.destroyAllWindows()
 
@@ -58,7 +58,7 @@ def main():
     hanging2 = cv.imread("project_images/Hanging2.png")
     hanging_stitched = stitch_two_images(hanging1, hanging2,
                                          ransacDisplayName="13. RANSAC Matches for Hanging1 and Hanging2 "
-                                                           "(src_old/project_images/output/Bonus3a_Hanging_RANSAC.png)",
+                                                           "(as_is/project_images/output/Bonus3a_Hanging_RANSAC.png)",
                                          siftDisplayName="",
                                          siftFilePath="",
                                          saveSiftMatches=False,
@@ -67,7 +67,7 @@ def main():
                                          ransacIterations=ransacIterations,
                                          ransacThreshold=ransacThreshold
                                          )
-    cv.imshow("14. Hanging Stitched (src_old/project_images/output/Bonus3b_Hanging_Stitched.png)", hanging_stitched)
+    cv.imshow("14. Hanging Stitched (as_is/project_images/output/Bonus3b_Hanging_Stitched.png)", hanging_stitched)
     cv.imwrite("project_images/output/Bonus3b_Hanging_Stitched.png", hanging_stitched)
     cv.waitKey(0)
     cv.destroyAllWindows()
@@ -86,10 +86,10 @@ def stitch_rainier(rainier1, rainier2, ransacIterations, ransacThreshold):
     stitched_image = stitch_two_images(
         rainier1,
         rainier2,
-        siftDisplayName="2. SIFT matches for Rainier 1-2 (src_old/project_images/output/2.png)",
+        siftDisplayName="2. SIFT matches for Rainier 1-2 (as_is/project_images/output/2.png)",
         siftFilePath="project_images/output/2.png",
         saveSiftMatches=True,
-        ransacDisplayName="3. RANSAC Matches for Rainier1 and Rainier2 (src_old/project_images/output/3.png)",
+        ransacDisplayName="3. RANSAC Matches for Rainier1 and Rainier2 (as_is/project_images/output/3.png)",
         saveRansacMatches=True,
         ransacFilePath="project_images/output/3.png",
         ransacIterations=ransacIterations,
@@ -102,7 +102,7 @@ def stitch_rainier(rainier1, rainier2, ransacIterations, ransacThreshold):
     print("Rainier1 and Rainier2 Stitched saved to " + Rainier1_2_file_path)
 
     cv.imshow(
-        "4. Stitched Rainier1 and Rainier2 (R1-2) (src_old/project_images/output/4.png)",
+        "4. Stitched Rainier1 and Rainier2 (R1-2) (as_is/project_images/output/4.png)",
         stitched_image,
     )
     cv.waitKey(0)
@@ -140,7 +140,7 @@ def stitch_rainier(rainier1, rainier2, ransacIterations, ransacThreshold):
     # End source
 
     cv.imshow(
-        "9. Stitched Rainier1-6 (Scaled 50% for Displaying) (src_old/project_images/output5.png)",
+        "9. Stitched Rainier1-6 (Scaled 50% for Displaying) (as_is/project_images/output5.png)",
         stitched_image,
     )
     cv.waitKey(0)
@@ -155,7 +155,7 @@ def bonus2_stitch_japan(japan1, japan2, japan3, ransacIterations, ransacThreshol
         siftFilePath="",
         saveSiftMatches=False,
         ransacDisplayName="10. RANSAC Matches for Japan1 and Japan2 (JP1-2) "
-        "(src_old/project_images/output/Bonus2a_RANSAC_jp1_2.png) ",
+        "(as_is/project_images/output/Bonus2a_RANSAC_jp1_2.png) ",
         saveRansacMatches=True,
         ransacFilePath="project_images/output/Bonus2a_RANSAC_jp1_2.png",
         ransacIterations=ransacIterations,
@@ -168,7 +168,7 @@ def bonus2_stitch_japan(japan1, japan2, japan3, ransacIterations, ransacThreshol
         siftFilePath="",
         saveSiftMatches=False,
         ransacDisplayName="11. JP1-3 RANSAC Matches "
-        "(src_old/project_images/output/Bonus2b_RANSAC_jp1_2_3.png)",
+        "(as_is/project_images/output/Bonus2b_RANSAC_jp1_2_3.png)",
         saveRansacMatches=True,
         ransacFilePath="project_images/output/Bonus2b_RANSAC_jp1_2_3.png",
         ransacIterations=ransacIterations,
@@ -178,7 +178,7 @@ def bonus2_stitch_japan(japan1, japan2, japan3, ransacIterations, ransacThreshol
     cv.imwrite(jp_stitched_path, jp_all_stitched)
     print("Stitched Japan1-3 saved to " + jp_stitched_path)
     cv.imshow(
-        "12. Stitched Japan1-3 (src_old/project_images/output/Bonus2c_Japan_AllStitched.png)",
+        "12. Stitched Japan1-3 (as_is/project_images/output/Bonus2c_Japan_AllStitched.png)",
         jp_all_stitched,
     )
     cv.waitKey(0)

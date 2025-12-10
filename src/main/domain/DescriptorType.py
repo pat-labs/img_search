@@ -7,5 +7,5 @@ class DescriptorType(Enum):
     KAZE = 3
     AKAZE = 4
     BRISK = 5
-    #ANSIOTROPIC_SIFT = 6
-    #SIFT_ADHOC = 7
+    ANSIOTROPIC_SIFT = 6
+    SIFT_ADHOC = 7

@@ -14,8 +14,8 @@ class BaseImageSearch:
     def __init__(self):
         self.dataset_dir = "/home/patrick/Documents/project/img_search/asset/dataset/sanitize"
         # Sanitized dataset
-        # train_dir = "/home/patrick/Documents/project/img_search/asset/dataset/train"
-        # sanitize_dir = "/home/patrick/Documents/project/img_search/asset/dataset/sanitize"
+        # train_dir = "/home/patrick/Documents/project/latex/asset/dataset/train"
+        # sanitize_dir = "/home/patrick/Documents/project/latex/asset/dataset/sanitize"
         # images_data = ImageUtil.load_image_paths_and_labels(train_dir)
         # ImageSanitizer.sanitize_dataset(images_data, sanitize_dir)
 

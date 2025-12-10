@@ -63,13 +63,13 @@ class ImageDescriptorAnalyzer:
 
 if __name__ == '__main__':
     base_path = "/home/patrick/Documents/project/img_search/asset/"
-    #image_path = base_path + "dataset/cancer/train/brain_glioma/brain_glioma_0001.jpg"
+    #image_path = base_dir + "dataset/cancer/train/brain_glioma/brain_glioma_0001.jpg"
     image_path = base_path + "dataset/clothes/train/a824deb0-6985-4b11-a987-74d47f5fc33e.jpg"
-    #image_path = base_path + "dataset/flowers/train/daisy/2481823240_eab0d86921.jpg"
+    #image_path = base_dir + "dataset/flowers/train/daisy/2481823240_eab0d86921.jpg"
     report_dir = base_path + "report/"
     transform_dir = base_path + "dataset/variance_clothes/"
     #ImageUtil.create_image_variances(image_path, transform_dir)
-    #train_dir = "/home/patrick/Documents/project/img_search/asset/dataset/train"
+    #train_dir = "/home/patrick/Documents/project/latex/asset/dataset/train"
     images_data = ImageUtil.load_image_data_from_folder(transform_dir)
     #print([img.path for img in images_data])
     report_mk = ImageDescriptorAnalyzer.analyze_image_descriptors(image_path, [img.path for img in images_data])
