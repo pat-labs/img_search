@@ -13,8 +13,8 @@ The comparison demonstrates a classic engineering trade-off between **computatio
 * **Photometric Stability (Blur/Brightness):** Both algorithms handle brightness and blur reasonably well, but the Anisotropic version consistently achieves match ratios of **0.80–0.90** (vs. ~0.35 for Adhoc), providing much higher confidence for medical imaging or variable lighting conditions.
 
 #### 3. Computational Cost (The "41-Hour" Factor)
-* **Time Complexity:** The Anisotropic implementation is **orders of magnitude slower**. While Adhoc SIFT processes images in seconds or minutes (0.004 – 0.05 hrs), the Anisotropic version averages roughly 0.5 to 4 hours per variant.
-* **The Scaling Bottleneck:** The custom implementation exhibits extreme sensitivity to image upscaling. In the second dataset, the `scale_up_1.5x` operation took **41.79 hours**, suggesting a non-linear (likely cubic or worse) complexity regarding image resolution or scale-space construction.
+* **Time Complexity:** The Anisotropic implementation is **orders of magnitude slower**. While Adhoc SIFT processes images in seconds or minutes (0.004 – 0.05 hrs), the Anisotropic version averages roughly 0.5 to 4 seconds per variant.
+* **The Scaling Bottleneck:** The custom implementation exhibits extreme sensitivity to image upscaling. In the second dataset, the `scale_up_1.5x` operation took **41.79 seconds**, suggesting a non-linear (likely cubic or worse) complexity regarding image resolution or scale-space construction.
 
 ### Comparative Verdict Table
 
